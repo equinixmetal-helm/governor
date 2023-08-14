@@ -15,7 +15,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Publish Helm Chart
-        uses: tylerauerbeck/helm-gh-pages@main
+        uses: stefanprodan/helm-gh-pages@master
         with:
           token: ${{ secrets.PUBLIC_REPO_GH_PAT }}
           charts_dir: governor-api
