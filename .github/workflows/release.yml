@@ -18,7 +18,7 @@ jobs:
         uses: stefanprodan/helm-gh-pages@master
         with:
           token: ${{ secrets.PUBLIC_REPO_GH_PAT }}
-          charts_dir: ./governor-api/
+          charts_dir: ../governor-api/
           charts_url: 'https://helm.equinixmetal.com'
           repository: 'charts'
           branch: gh-pages
