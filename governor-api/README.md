@@ -1,7 +1,5 @@
 # Governor
 
-This is a helm chart that deploys a [Krakend](https://www.krakend.io/) instance.
-
 ## Description
 
 A repo holding the Kubernetes deployment manifests for the governor ecosystem
@@ -74,7 +72,7 @@ helm install governor-api equinixmetal/governor-api
 | governor.adminGroups | string | `"governor-admins"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/metal-toolbox/governor-api"` |  |
-| image.tag | string | `"43-520c6716"` |  |
+| image.tag | string | `"232-48c7920f"` |  |
 | ingress.domains | list | `[]` |  |
 | ingress.enabled | bool | `true` |  |
 | k8s-otel-collector.include_otel_attributes | bool | `false` |  |
