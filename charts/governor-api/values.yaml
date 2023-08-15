@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/metal-toolbox/governor-api
-  tag: 232-48c7920f
+  tag: 243-dec3db14
   pullPolicy: IfNotPresent
 
 ingress:
