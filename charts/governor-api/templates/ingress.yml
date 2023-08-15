@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-  name: {{ template "common.names.fullname" . }}-api
+  name: {{ template "common.names.fullname" . }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   ingressClassName: nginx-governor
@@ -16,17 +16,17 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ template "common.names.fullname" $ }}-api
+                name: {{ template "common.names.fullname" $ }}
                 port:
                   name: http
           - path: "/healthz"
             pathType: Prefix
             backend:
               service:
-                name: {{ template "common.names.fullname" $ }}-api
+                name: {{ template "common.names.fullname" $ }}
                 port:
                   name: http
   tls:
     - hosts:
         - {{ .Values.api.ingress.host }}
-      secretName: {{ template "common.names.fullname" . }}-api-tls
+      secretName: {{ template "common.names.fullname" . }}-tls
