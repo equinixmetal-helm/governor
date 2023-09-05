@@ -34,56 +34,32 @@ helm install governor-api equinixmetal/governor-api
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| api.adminGroups | string | `"governor-admins"` |  |
-| api.db.connections.max_idle | int | `20` |  |
-| api.db.connections.max_lifetime | int | `0` |  |
-| api.db.connections.max_open | int | `20` |  |
-| api.db.secrets.crdbCrt | string | `nil` |  |
-| api.db.secrets.enabled | bool | `false` |  |
-| api.db.secrets.uri | string | `nil` |  |
-| api.db.uri.existingSecret | string | `"db-uri"` |  |
-| api.debug | bool | `false` |  |
-| api.enabled | bool | `true` |  |
-| api.image.pullPolicy | string | `"IfNotPresent"` |  |
-| api.image.repository | string | `"ghcr.io/metal-toolbox/governor-api"` |  |
-| api.image.tag | string | `"243-dec3db14"` |  |
-| api.ingress.host | string | `"api.governor.example.com"` |  |
-| api.ingress.prefix | string | `"api.governor"` |  |
-| api.nats.credsPath | string | `"/nats"` |  |
-| api.nats.secrets.clientCreds | string | `nil` |  |
-| api.nats.secrets.enabled | bool | `false` |  |
-| api.nats.subjectPrefix | string | `"governor.events"` |  |
-| api.nats.url | string | `nil` |  |
-| api.oidc[0].audience | string | `""` |  |
-| api.oidc[0].enabled | bool | `true` |  |
-| api.oidc[0].issuer | string | `""` |  |
-| api.oidc[0].jwksuri | string | `""` |  |
-| api.oidc[0].rolesClaim | string | `""` |  |
-| api.oidc[0].userClaim | string | `""` |  |
-| api.readinessProbe.failureThreshold | int | `3` |  |
-| api.readinessProbe.periodSeconds | int | `20` |  |
-| api.readinessProbe.successThreshold | int | `1` |  |
-| api.readinessProbe.timeoutSeconds | int | `3` |  |
-| api.replicaCount | int | `2` |  |
-| api.resources.limits.cpu | string | `"500m"` |  |
-| api.resources.limits.memory | string | `"1Gi"` |  |
-| api.resources.requests.cpu | string | `"100m"` |  |
-| api.resources.requests.memory | string | `"128Mi"` |  |
-| api.tracing.enabled | bool | `true` |  |
-| api.tracing.secrets.enabled | bool | `false` |  |
-| api.tracing.secrets.honeycombKey | string | `nil` |  |
-| audit.auditImage.pullPolicy | string | `"IfNotPresent"` |  |
-| audit.auditImage.repository | string | `"ghcr.io/metal-toolbox/audittail"` |  |
-| audit.auditImage.tag | string | `"v0.7.0"` |  |
-| audit.initContainer.resources.limits.cpu | string | `"100m"` |  |
-| audit.initContainer.resources.limits.memory | string | `"20Mi"` |  |
-| audit.initContainer.resources.requests.cpu | string | `"100m"` |  |
-| audit.initContainer.resources.requests.memory | string | `"20Mi"` |  |
-| audit.resources.limits.cpu | string | `"500m"` |  |
-| audit.resources.limits.memory | string | `"1Gi"` |  |
-| audit.resources.requests.cpu | string | `"100m"` |  |
-| audit.resources.requests.memory | string | `"128Mi"` |  |
-| k8s-otel-collector.include_otel_attributes | bool | `false` |  |
+| api | object | `{"adminGroups":"governor-admins","db":{"connections":{"max_idle":20,"max_lifetime":0,"max_open":20},"secrets":{"crdbCrt":null,"enabled":false,"uri":null},"uri":{"existingSecret":"db-uri"}},"debug":false,"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-api","tag":"243-dec3db14"},"ingress":{"host":"api.governor.example.com","prefix":"api.governor"},"nats":{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null},"oidc":[{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}],"readinessProbe":{"failureThreshold":3,"periodSeconds":20,"successThreshold":1,"timeoutSeconds":3},"replicaCount":2,"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}},"tracing":{"enabled":true,"secrets":{"enabled":false,"honeycombKey":null}}}` | governor-api settings |
+| api.adminGroups | string | `"governor-admins"` | admin group for highest level permissions in the governor-api |
+| api.db | object | `{"connections":{"max_idle":20,"max_lifetime":0,"max_open":20},"secrets":{"crdbCrt":null,"enabled":false,"uri":null},"uri":{"existingSecret":"db-uri"}}` | settings for the backend db |
+| api.db.secrets | object | `{"crdbCrt":null,"enabled":false,"uri":null}` | db secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
+| api.debug | bool | `false` | set to true to turn on debug logging |
+| api.image | object | `{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-api","tag":"243-dec3db14"}` | image for the governor-api |
+| api.ingress | object | `{"host":"api.governor.example.com","prefix":"api.governor"}` | ingress settings for the governor-api |
+| api.nats | object | `{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null}` | nats settings for the governor-api |
+| api.oidc | list | `[{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}]` | oidc settings, currently startup will fail without a valid oidc config |
+| api.replicaCount | int | `2` | replicas of the governor-api |
+| api.resources | object | `{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | resource settings for the governor-api |
+| api.tracing | object | `{"enabled":true,"secrets":{"enabled":false,"honeycombKey":null}}` | tracing settings |
+| api.tracing.secrets | object | `{"enabled":false,"honeycombKey":null}` | tracing secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
+| audit | object | `{"auditImage":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/audittail","tag":"v0.7.0"},"enabled":true,"initContainer":{"resources":{"limits":{"cpu":"100m","memory":"20Mi"},"requests":{"cpu":"100m","memory":"20Mi"}}},"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}}` | audit sidecar settings |
+| k8s-otel-collector | object | `{"include_otel_attributes":false}` | settings for the otel collector sub-chart ref https://github.com/equinixmetal-helm/k8s-otel-collector |
+| slackAddon | object | `{"api":{"audience":"https://api.governor.example.com","clientId":"gov-slack-addon-governor","url":"https://api.governor.example.com"},"autoscaling":{"enabled":false},"debug":false,"dryrun":false,"enabled":true,"hydra":{"url":"https://hydra.example.com/oauth2/token"},"image":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-slack-addon","tag":"46-c41b0158"},"nats":{"credsPath":"/nats","subjectPrefix":"equinixmetal.governor.events","url":"tls://nats.governor.hollow-a.sv15.metalkube.net:4222,tls://nats.governor.hollow-a.dc10.metalkube.net:4222,tls://nats.governor.hollow-a.ch3.metalkube.net:4222"},"nodeSelector":null,"pretty":false,"reconciler":{"interval":"1h","locking":true},"replicas":1,"resources":{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"250m","memory":"500Mi"}},"securityContext":{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000},"service":{"port":80},"tolerations":null}` | slack-addon settings |
+| slackAddon.api | object | `{"audience":"https://api.governor.example.com","clientId":"gov-slack-addon-governor","url":"https://api.governor.example.com"}` | governor-api settings to retrieve required information by the slack addon |
+| slackAddon.debug | bool | `false` | set to true to turn on debug logging |
+| slackAddon.dryrun | bool | `false` | dryrun on the reconcile loop |
+| slackAddon.enabled | bool | `true` | set to false to disable this addon completely |
+| slackAddon.hydra | object | `{"url":"https://hydra.example.com/oauth2/token"}` | hydra settings for communication with the governor-api |
+| slackAddon.image | object | `{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-slack-addon","tag":"46-c41b0158"}` | image settings for the slack addon |
+| slackAddon.nats | object | `{"credsPath":"/nats","subjectPrefix":"equinixmetal.governor.events","url":"tls://nats.governor.hollow-a.sv15.metalkube.net:4222,tls://nats.governor.hollow-a.dc10.metalkube.net:4222,tls://nats.governor.hollow-a.ch3.metalkube.net:4222"}` | nats setup for the slack addon |
+| slackAddon.pretty | bool | `false` | set to true for human readable logging |
+| slackAddon.resources | dict | `{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"250m","memory":"500Mi"}}` | resource limits & requests ref: https://kubernetes.io/docs/user-guide/compute-resources/ |
+| slackAddon.securityContext | object | `{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | Security context to be added to the deployment |
 
 ## Development
 

@@ -1,14 +1,16 @@
-# governor-api settings
+# -- governor-api settings
 api:
   enabled: true
-  # set to true to turn on debug logging
+  # -- set to true to turn on debug logging
   debug: false
 
+  # -- image for the governor-api
   image:
     repository: ghcr.io/metal-toolbox/governor-api
     tag: 243-dec3db14
     pullPolicy: IfNotPresent
 
+  # -- ingress settings for the governor-api
   ingress:
     host: api.governor.example.com
     prefix: api.governor
@@ -19,8 +21,10 @@ api:
     successThreshold: 1
     failureThreshold: 3
 
+  # -- admin group for highest level permissions in the governor-api
   adminGroups: "governor-admins"
 
+  # -- nats settings for the governor-api
   nats:
     url:
     credsPath: /nats
@@ -30,7 +34,7 @@ api:
       enabled: false
       clientCreds:
 
-  # oidc settings, currently startup will fail without a valid oidc config
+  # --  oidc settings, currently startup will fail without a valid oidc config
   oidc:
     - audience: ""
       issuer: ""
@@ -39,7 +43,9 @@ api:
       rolesClaim: ""
       userClaim: ""
 
+  # -- replicas of the governor-api
   replicaCount: 2
+  # -- resource settings for the governor-api
   resources:
     limits:
       cpu: 500m
@@ -48,29 +54,101 @@ api:
       cpu: 100m
       memory: 128Mi
 
-  # settings for the backend db
+  # -- settings for the backend db
   db:
     connections:
       max_open: 20
       max_idle: 20
       max_lifetime: 0
-    # set to `true` if you want to set the value directly in the chart (not recommended)
+    # -- db secrets, set to `true` if you want to set the value directly in the chart (not recommended)
     secrets:
       enabled: false
       uri:
       crdbCrt:
     uri:
       existingSecret: db-uri
-  # tracing settings
+  # -- tracing settings
   tracing:
     enabled: true
-    # set to `true` if you want to set the value directly in the chart (not recommended)
+    # -- tracing secrets, set to `true` if you want to set the value directly in the chart (not recommended)
     secrets:
       enabled: false
       honeycombKey:
 
-# audit sidecar settings
+# -- slack-addon settings
+slackAddon:
+  # -- set to false to disable this addon completely
+  enabled: true
+
+  # -- set to true to turn on debug logging
+  debug: false
+  # -- set to true for human readable logging
+  pretty: false
+  # -- dryrun on the reconcile loop
+  dryrun: false
+
+  # -- governor-api settings to retrieve required information by the slack addon
+  api:
+    url: https://api.governor.example.com
+    clientId: gov-slack-addon-governor
+    audience: https://api.governor.example.com
+
+  # -- hydra settings for communication with the governor-api
+  hydra:
+    url: https://hydra.example.com/oauth2/token
+
+
+  # -- nats setup for the slack addon
+  nats:
+    url: tls://nats.governor.hollow-a.sv15.metalkube.net:4222,tls://nats.governor.hollow-a.dc10.metalkube.net:4222,tls://nats.governor.hollow-a.ch3.metalkube.net:4222
+    credsPath: /nats
+    subjectPrefix: equinixmetal.governor.events
+
+  # reconciler will run at the defined interval to ensure no events were missed
+  reconciler:
+    interval: 1h
+    locking: true
+
+  replicas: 1
+
+  autoscaling:
+    enabled: false
+
+  nodeSelector:
+
+  tolerations:
+
+  # -- image settings for the slack addon
+  image:
+    repository: ghcr.io/metal-toolbox/governor-slack-addon
+    tag: "46-c41b0158"
+    pullPolicy: IfNotPresent
+
+  # -- Security context to be added to the deployment
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  service:
+    port: 80
+
+  # -- (dict) resource limits & requests
+  # ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 250m
+      memory: 500Mi
+
+# -- audit sidecar settings
 audit:
+  enabled: true
   auditImage:
     repository: ghcr.io/metal-toolbox/audittail
     tag: v0.7.0
@@ -90,6 +168,15 @@ audit:
       requests:
         cpu: 100m
         memory: 20Mi
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
 
+# -- settings for the otel collector sub-chart
+# ref https://github.com/equinixmetal-helm/k8s-otel-collector
 k8s-otel-collector:
   include_otel_attributes: false
