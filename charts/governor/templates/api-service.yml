@@ -1,8 +1,9 @@
+{{- if .Values.api.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: governor-api
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     app.kubernetes.io/component: api
 spec:
@@ -15,3 +16,4 @@ spec:
     app.kubernetes.io/component: api
   sessionAffinity: None
   type: ClusterIP
+{{- end }}

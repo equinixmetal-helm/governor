@@ -1,8 +1,8 @@
 apiVersion: v2
-name: governor-api
-description: A helm chart for Governor-API
+name: governor
+description: A helm chart for the Governor ecosystem
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: v0.0.1
 
 dependencies:
