@@ -1,20 +1,21 @@
+{{- if .Values.api.enabled }}
 {{- $root := . -}}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "common.names.fullname" . }}-config
+  name: governor-api-config
   annotations:
     argocd.argoproj.io/sync-wave: '-1'
 data:
   .governor.yaml: |
     admin-groups:
-      - {{ .Values.governor.adminGroups }}
+      - {{ .Values.api.adminGroups }}
 
     nats:
-      url: {{ .Values.nats.url }}
-      creds-file: {{ .Values.nats.credsPath }}/{{ template "common.names.fullname" . }}-nats-client-creds
-      subject-prefix: {{ .Values.nats.subjectPrefix }}
+      url: {{ .Values.api.nats.url }}
+      creds-file: {{ .Values.api.nats.credsPath }}/governor-api-nats-client-creds
+      subject-prefix: {{ .Values.api.nats.subjectPrefix }}
 
     oidc:
     {{- range .Values.api.oidc }}
@@ -33,19 +34,20 @@ data:
           {{- end }}
     {{- end }}
 
-    {{- if .Values.debug }}
+    {{- if .Values.api.debug }}
     logging:
       debug: true
       pretty: true
     {{- end }}
 
-    {{- if .Values.tracing.enabled }}
+    {{- if .Values.api.tracing.enabled }}
     tracing:
       enabled: true
     {{- end }}
 
     db:
       connections:
-        max_open: {{ .Values.db.connections.max_open }}
-        max_idle: {{ .Values.db.connections.max_idle }}
-        max_lifetime: {{ .Values.db.connections.max_lifetime }}
+        max_open: {{ .Values.api.db.connections.max_open }}
+        max_idle: {{ .Values.api.db.connections.max_idle }}
+        max_lifetime: {{ .Values.api.db.connections.max_lifetime }}
+{{- end }}

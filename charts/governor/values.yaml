@@ -1,0 +1,95 @@
+# governor-api settings
+api:
+  enabled: true
+  # set to true to turn on debug logging
+  debug: false
+
+  image:
+    repository: ghcr.io/metal-toolbox/governor-api
+    tag: 243-dec3db14
+    pullPolicy: IfNotPresent
+
+  ingress:
+    host: api.governor.example.com
+    prefix: api.governor
+
+  readinessProbe:
+    periodSeconds: 20
+    timeoutSeconds: 3
+    successThreshold: 1
+    failureThreshold: 3
+
+  adminGroups: "governor-admins"
+
+  nats:
+    url:
+    credsPath: /nats
+    subjectPrefix: governor.events
+    # set to `true` if you want to set the value directly in the chart (not recommended)
+    secrets:
+      enabled: false
+      clientCreds:
+
+  # oidc settings, currently startup will fail without a valid oidc config
+  oidc:
+    - audience: ""
+      issuer: ""
+      jwksuri: ""
+      enabled: true
+      rolesClaim: ""
+      userClaim: ""
+
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # settings for the backend db
+  db:
+    connections:
+      max_open: 20
+      max_idle: 20
+      max_lifetime: 0
+    # set to `true` if you want to set the value directly in the chart (not recommended)
+    secrets:
+      enabled: false
+      uri:
+      crdbCrt:
+    uri:
+      existingSecret: db-uri
+  # tracing settings
+  tracing:
+    enabled: true
+    # set to `true` if you want to set the value directly in the chart (not recommended)
+    secrets:
+      enabled: false
+      honeycombKey:
+
+# audit sidecar settings
+audit:
+  auditImage:
+    repository: ghcr.io/metal-toolbox/audittail
+    tag: v0.7.0
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  initContainer:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 20Mi
+      requests:
+        cpu: 100m
+        memory: 20Mi
+
+k8s-otel-collector:
+  include_otel_attributes: false

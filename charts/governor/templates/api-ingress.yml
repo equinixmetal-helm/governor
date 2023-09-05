@@ -1,10 +1,11 @@
+{{- if .Values.api.enabled }}
 ---
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-  name: {{ template "common.names.fullname" . }}
+  name: governor-api
   labels: {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   ingressClassName: nginx-governor
@@ -16,17 +17,18 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ template "common.names.fullname" $ }}
+                name: governor-api
                 port:
                   name: http
           - path: "/healthz"
             pathType: Prefix
             backend:
               service:
-                name: {{ template "common.names.fullname" $ }}
+                name: governor-api
                 port:
                   name: http
   tls:
     - hosts:
         - {{ .Values.api.ingress.host }}
-      secretName: {{ template "common.names.fullname" . }}-tls
+      secretName: governor-api-tls
+{{- end }}

@@ -8,7 +8,7 @@ jobs:
     - name: Prep helm
       uses: WyriHaximus/github-action-helm3@v3
       with:
-        exec: helm template --output-dir test-output/ charts/governor-api
+        exec: helm template --output-dir test-output/ charts/governor
     - name: yaml-lint
       uses: ibiqlik/action-yamllint@v3
       with:

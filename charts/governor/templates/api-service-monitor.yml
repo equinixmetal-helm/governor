@@ -1,8 +1,9 @@
+{{- if .Values.api.enabled }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: governor-api
   labels: {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   namespaceSelector:
@@ -15,3 +16,4 @@ spec:
   - targetPort: 3001
     path: /metrics
     interval: 5s
+{{- end }}
