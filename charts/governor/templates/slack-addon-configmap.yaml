@@ -1,0 +1,20 @@
+{{- if .Values.slackAddon.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gov-slack-addon-config
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  GSA_DRYRUN: "{{ .Values.slackAddon.dryrun }}"
+  GSA_LOGGING_DEBUG: "{{ .Values.slackAddon.debug }}"
+  GSA_LOGGING_PRETTY: "{{ .Values.slackAddon.pretty }}"
+  GSA_GOVERNOR_AUDIENCE: "{{ .Values.slackAddon.api.audience }}"
+  GSA_GOVERNOR_CLIENT_ID: "{{ .Values.slackAddon.api.clientId }}"
+  GSA_GOVERNOR_URL: "{{ .Values.slackAddon.api.url }}"
+  GSA_GOVERNOR_TOKEN_URL: "{{ .Values.slackAddon.hydra.url }}"
+  GSA_NATS_URL: "{{ .Values.slackAddon.nats.url }}"
+  GSA_NATS_CREDS_FILE: "{{ .Values.slackAddon.nats.credsPath }}/{{ template "common.names.fullname" . }}-nats-client-creds"
+  GSA_RECONCILER_INTERVAL:  "{{ .Values.slackAddon.reconciler.interval }}"
+  GSA_RECONCILER_LOCKING:  "{{ .Values.slackAddon.reconciler.locking }}"
+{{- end }}
