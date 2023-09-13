@@ -1,24 +1,35 @@
 # -- governor-api settings
 api:
+  # -- enable the governor-api components
   enabled: true
   # -- set to true to turn on debug logging
   debug: false
 
   # -- image for the governor-api
   image:
+    # -- container image repository for the governor-api image
     repository: ghcr.io/metal-toolbox/governor-api
+    # -- image tag version
     tag: 243-dec3db14
+    # -- image pull policy for the governor-api container
     pullPolicy: IfNotPresent
 
   # -- ingress settings for the governor-api
   ingress:
+    # -- host definition for the api ingress
     host: api.governor.example.com
+    # -- prefix use for the governor api ingress
     prefix: api.governor
 
+  # -- readiness probe definitions for the governor-api pod
   readinessProbe:
+    # -- interval to run the readiness probe
     periodSeconds: 20
+    # -- number of seconds to wait for the probe to timeout
     timeoutSeconds: 3
+    # -- minimum consecutive successes for probe to be considered successful
     successThreshold: 1
+    # -- minimum consecutive failures for the probe to be considered unhealthy
     failureThreshold: 3
 
   # -- admin group for highest level permissions in the governor-api
@@ -26,16 +37,22 @@ api:
 
   # -- nats settings for the governor-api
   nats:
+    # -- url to connection to nats
     url:
+    # -- mount path for the nats creds file
     credsPath: /nats
+    # -- subject prefix used for the nats events
     subjectPrefix: governor.events
-    # set to `true` if you want to set the value directly in the chart (not recommended)
+    # -- nats secrets definitions
     secrets:
+      # -- enable helm secrets, set to `true` if you want to set the value directly in the chart (not recommended)
       enabled: false
+      # -- client credentials secrets
       clientCreds:
 
   # --  oidc settings, currently startup will fail without a valid oidc config
   oidc:
+    # -- a unique identifier for your app that is issued to you when you register your app with the IdP
     - audience: ""
       issuer: ""
       jwksuri: ""
