@@ -39,10 +39,28 @@ helm install governor-api equinixmetal/governor-api
 | api.db | object | `{"connections":{"max_idle":20,"max_lifetime":0,"max_open":20},"secrets":{"crdbCrt":null,"enabled":false,"uri":null},"uri":{"existingSecret":"db-uri"}}` | settings for the backend db |
 | api.db.secrets | object | `{"crdbCrt":null,"enabled":false,"uri":null}` | db secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
 | api.debug | bool | `false` | set to true to turn on debug logging |
+| api.enabled | bool | `true` | enable the governor-api components |
 | api.image | object | `{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-api","tag":"243-dec3db14"}` | image for the governor-api |
+| api.image.pullPolicy | string | `"IfNotPresent"` | image pull policy for the governor-api container |
+| api.image.repository | string | `"ghcr.io/metal-toolbox/governor-api"` | container image repository for the governor-api image |
+| api.image.tag | string | `"243-dec3db14"` | image tag version |
 | api.ingress | object | `{"host":"api.governor.example.com","prefix":"api.governor"}` | ingress settings for the governor-api |
+| api.ingress.host | string | `"api.governor.example.com"` | host definition for the api ingress |
+| api.ingress.prefix | string | `"api.governor"` | prefix use for the governor api ingress |
 | api.nats | object | `{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null}` | nats settings for the governor-api |
+| api.nats.credsPath | string | `"/nats"` | mount path for the nats creds file |
+| api.nats.secrets | object | `{"clientCreds":null,"enabled":false}` | nats secrets definitions |
+| api.nats.secrets.clientCreds | string | `nil` | client credentials secrets |
+| api.nats.secrets.enabled | bool | `false` | enable helm secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
+| api.nats.subjectPrefix | string | `"governor.events"` | subject prefix used for the nats events |
+| api.nats.url | string | `nil` | url to connection to nats |
 | api.oidc | list | `[{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}]` | oidc settings, currently startup will fail without a valid oidc config |
+| api.oidc[0] | object | `{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}` | a unique identifier for your app that is issued to you when you register your app with the IdP |
+| api.readinessProbe | object | `{"failureThreshold":3,"periodSeconds":20,"successThreshold":1,"timeoutSeconds":3}` | readiness probe definitions for the governor-api pod |
+| api.readinessProbe.failureThreshold | int | `3` | minimum consecutive failures for the probe to be considered unhealthy |
+| api.readinessProbe.periodSeconds | int | `20` | interval to run the readiness probe |
+| api.readinessProbe.successThreshold | int | `1` | minimum consecutive successes for probe to be considered successful |
+| api.readinessProbe.timeoutSeconds | int | `3` | number of seconds to wait for the probe to timeout |
 | api.replicaCount | int | `2` | replicas of the governor-api |
 | api.resources | object | `{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | resource settings for the governor-api |
 | api.tracing | object | `{"enabled":true,"secrets":{"enabled":false,"honeycombKey":null}}` | tracing settings |
