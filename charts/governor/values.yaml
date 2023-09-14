@@ -117,9 +117,9 @@ slackAddon:
 
   # -- nats setup for the slack addon
   nats:
-    url: tls://nats.governor.hollow-a.sv15.metalkube.net:4222,tls://nats.governor.hollow-a.dc10.metalkube.net:4222,tls://nats.governor.hollow-a.ch3.metalkube.net:4222
+    url: tls://nats.governor.example.com:4222,
     credsPath: /nats
-    subjectPrefix: equinixmetal.governor.events
+    subjectPrefix: governor.events
 
   # reconciler will run at the defined interval to ensure no events were missed
   reconciler:
