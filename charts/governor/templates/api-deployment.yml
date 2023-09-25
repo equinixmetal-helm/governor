@@ -4,17 +4,26 @@ apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
   name: governor-api
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
-    app.kubernetes.io/component: api
+  labels: 
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- with .Values.api.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.api.replicaCount }}
   revisionHistoryLimit: 3
   selector:
-    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+    matchLabels: 
+    {{- with .Values.api.matchLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   template:
     metadata:
-      labels: {{- include "common.labels.standard" . | nindent 8 }}
-        app.kubernetes.io/component: api
+      labels: 
+      helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+      {{- with .Values.api.labels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yml") . | sha256sum }}
     spec:

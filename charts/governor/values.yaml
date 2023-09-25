@@ -2,6 +2,20 @@
 api:
   # -- enable the governor-api components
   enabled: true
+
+  # -- set of additional labels for the application 
+  labels:
+    app.kubernetes.io/instance: governor
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: governor
+    app.kubernetes.io/component: api
+
+  # -- set of additional match labels for the application 
+  matchLabels:
+    app.kubernetes.io/instance: governor
+    app.kubernetes.io/name: governor
+    app.kubernetes.io/component: api
+
   # -- set to true to turn on debug logging
   debug: false
 
@@ -96,6 +110,17 @@ api:
 slackAddon:
   # -- set to false to disable this addon completely
   enabled: true
+
+  # -- set of labels for the application 
+  labels:
+    app.kubernetes.io/instance: gov-slack-addon
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: gov-slack-addon
+
+  # -- set of match labels for the application 
+  matchLabels:
+    app.kubernetes.io/instance: gov-slack-addon
+    app.kubernetes.io/name: gov-slack-addon
 
   # -- set to true to turn on debug logging
   debug: false
