@@ -20,10 +20,10 @@ spec:
   template:
     metadata:
       labels: 
-      helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-      {{- with .Values.api.labels }}
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        {{- with .Values.api.labels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yml") . | sha256sum }}
     spec:
