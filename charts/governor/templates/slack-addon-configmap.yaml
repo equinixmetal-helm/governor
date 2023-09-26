@@ -4,7 +4,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gov-slack-addon-config
-  labels: {{- include "common.labels.standard" . | nindent 4 }}
+  labels: 
+  {{- with .Values.slackAddon.labels }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 data:
   GSA_DRYRUN: "{{ .Values.slackAddon.dryrun }}"
   GSA_LOGGING_DEBUG: "{{ .Values.slackAddon.debug }}"
