@@ -1,9 +1,9 @@
 dependencies:
 - name: common
   repository: https://charts.bitnami.com/bitnami
-  version: 2.4.0
+  version: 2.12.0
 - name: k8s-otel-collector
   repository: https://helm.equinixmetal.com
   version: 0.6.1
-digest: sha256:9c3675256c0a44716b9d6f62e6e31684635e16fb32bc0673e351a10db5882f26
-generated: "2023-07-11T14:28:04.047272-04:00"
+digest: sha256:bad4ebe920dec521e0e0ba72bfdae494c25957bccbf0915707bc0424c6f792a6
+generated: "2023-09-27T23:30:44.279773516Z"
