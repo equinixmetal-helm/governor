@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels: 
     {{- with .Values.api.matchLabels }}
-      {{- toYaml . | nindent 4 }}
+      {{- toYaml . | nindent 6 }}
     {{- end }}
   template:
     metadata:
