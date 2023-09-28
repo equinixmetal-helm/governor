@@ -5,9 +5,10 @@ kind: ConfigMap
 metadata:
   name: gov-slack-addon-config
   labels: 
-  {{- with .Values.slackAddon.labels }}
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- with .Values.slackAddon.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 data:
   GSA_DRYRUN: "{{ .Values.slackAddon.dryrun }}"
   GSA_LOGGING_DEBUG: "{{ .Values.slackAddon.debug }}"
@@ -17,7 +18,7 @@ data:
   GSA_GOVERNOR_URL: "{{ .Values.slackAddon.api.url }}"
   GSA_GOVERNOR_TOKEN_URL: "{{ .Values.slackAddon.hydra.url }}"
   GSA_NATS_URL: "{{ .Values.slackAddon.nats.url }}"
-  GSA_NATS_CREDS_FILE: "{{ .Values.slackAddon.nats.credsPath }}/{{ template "common.names.fullname" . }}-nats-client-creds"
+  GSA_NATS_CREDS_FILE: "{{ .Values.slackAddon.nats.credsPath }}/gov-slack-addon-nats-client-creds"
   GSA_RECONCILER_INTERVAL:  "{{ .Values.slackAddon.reconciler.interval }}"
   GSA_RECONCILER_LOCKING:  "{{ .Values.slackAddon.reconciler.locking }}"
 {{- end }}

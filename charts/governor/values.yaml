@@ -14,7 +14,6 @@ api:
   matchLabels:
     app.kubernetes.io/instance: governor
     app.kubernetes.io/name: governor
-    app.kubernetes.io/component: api
 
   # -- set to true to turn on debug logging
   debug: false
@@ -24,7 +23,7 @@ api:
     # -- container image repository for the governor-api image
     repository: ghcr.io/metal-toolbox/governor-api
     # -- image tag version
-    tag: 243-dec3db14
+    tag: 428-3090bc42
     # -- image pull policy for the governor-api container
     pullPolicy: IfNotPresent
 
@@ -111,6 +110,11 @@ slackAddon:
   # -- set to false to disable this addon completely
   enabled: true
 
+  # -- ports for the slack addon container
+  ports:
+    - name: http
+      containerPort: 8000
+
   # -- set of labels for the application 
   labels:
     app.kubernetes.io/instance: gov-slack-addon
@@ -193,7 +197,7 @@ audit:
   enabled: true
   auditImage:
     repository: ghcr.io/metal-toolbox/audittail
-    tag: v0.7.0
+    tag: v0.8.0
     pullPolicy: IfNotPresent
   resources:
     limits:
