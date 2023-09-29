@@ -35,7 +35,7 @@ spec:
     {{- if .Values.audit.enabled }}
       initContainers:
       # Optional: Pre-creates the `/app-audit/audit.log` named pipe.
-      - image: "{{ .Values.audit.auditImage.registry }}/{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
+      - image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
         {{- with .Values.audit.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}
