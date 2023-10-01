@@ -12,7 +12,6 @@ metadata:
 spec:
   replicas: {{ .Values.oktaAddon.replicaCount }}
   revisionHistoryLimit: 3
-  selector:
   selector: 
   {{- with .Values.oktaAddon.matchLabels }}
     {{- toYaml . | nindent 6 }}
