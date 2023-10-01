@@ -105,6 +105,84 @@ api:
       enabled: false
       honeycombKey:
 
+# -- okta-addon settings
+oktaAddon:
+  # -- set to false to disable this addon completely
+  enabled: true
+
+  image:
+    repository: ghcr.io/metal-toolbox/gov-okta-addon
+    tag: 784-b89ffe9c
+    pullPolicy: IfNotPresent
+
+  # -- set of labels for the application 
+  labels:
+    app.kubernetes.io/instance: gov-okta-addon
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: gov-okta-addon
+
+  # -- set of match labels for the application 
+  matchLabels:
+    app.kubernetes.io/instance: gov-okta-addon
+    app.kubernetes.io/name: gov-okta-addon
+    
+  debug: false
+  dryrun: false
+  pretty: false
+
+  skipDelete: false
+
+  port: 8000
+
+  replicaCount: 1
+
+  # -- enables the prometheus rules if set to true
+  monitoring:
+    enabled: true
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+
+  # -- nats setup for the slack addon
+  nats:
+    url: tls://nats.governor.example.com:4222,
+    credsPath: /nats
+    subjectPrefix: governor.events
+
+    secrets:
+      # -- enable helm secrets, set to `true` if you want to set the value directly in the chart (not recommended)
+      enabled: false
+      # -- client credentials secrets
+      natsCreds: 
+      governorClientSecret: 
+      oktaToken:
+
+  # -- hydra settings for communication with the governor-api
+  hydra:
+    url: https://hydra.example.com/oauth2/token
+
+  # -- governor-api settings to retrieve required information by the slack addon
+  api:
+    url: https://api.governor.example.com
+    clientId: gov-slack-addon-governor
+
+  okta:
+    # -- This toggle exists because we've seen issue with the sdk caching responses from okta
+    nocache: true
+
+  reconciler:
+    interval: 3600s # update every hour
+    locking: true
+
+  eventlog:
+    lookback: 8h # look back 8 hours of Okta events on startup
+    interval: 30s # run eventlog poller every 30 seconds
+
 # -- slack-addon settings
 slackAddon:
   # -- set to false to disable this addon completely

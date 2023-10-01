@@ -1,0 +1,26 @@
+{{- if .Values.oktaAddon.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gov-okta-addon-config
+  labels: 
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- with .Values.oktaAddon.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  GOA_DEBUG: "{{ .Values.oktaAddon.debug }}"
+  GOA_DRYRUN: "{{ .Values.oktaAddon.dryrun }}"
+  GOA_PRETTY: "{{ .Values.oktaAddon.pretty }}"
+  GOA_OKTA_NOCACHE: "{{ .Values.oktaAddon.okta.nocache }}"
+  GOA_NATS_URL: "{{ .Values.oktaAddon.nats.url }}"
+  GOA_NATS_CREDS_FILE: "{{ .Values.oktaAddon.nats.credsPath }}/gov-okta-addon-nats-client-creds"
+  GOA_GOVERNOR_CLIENT_ID: "{{ .Values.oktaAddon.api.clientId }}"
+  GOA_GOVERNOR_URL: "{{ .Values.oktaAddon.api.url }}"
+  GOA_GOVERNOR_TOKEN_URL: "{{ .Values.oktaAddon.hydra.url }}"
+  GOA_RECONCILER_INTERVAL:  "{{ .Values.oktaAddon.reconciler.interval }}"
+  GOA_RECONCILER_LOCKING: "{{ .Values.oktaAddon.reconciler.locking }}"
+  GOA_EVENTLOG_INTERVAL:  "{{ .Values.oktaAddon.eventlog.interval }}"
+  GOA_EVENTLOG_LOOKBACK:  "{{ .Values.oktaAddon.eventlog.lookback }}"
+{{- end }}
