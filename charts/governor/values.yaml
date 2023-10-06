@@ -126,20 +126,27 @@ oktaAddon:
     app.kubernetes.io/instance: gov-okta-addon
     app.kubernetes.io/name: gov-okta-addon
 
+  # -- set to true to turn on debug logging
   debug: false
-  dryrun: false
+  # -- set to true for human readable logging
   pretty: false
+  # -- dryrun on the reconcile loop
+  dryrun: false
 
+  # -- skipDelete, when true, will not delete anything in okta during reconcile loop
   skipDelete: false
 
+  # -- port used for the gov-okta-addon service
   port: 8000
-
-  replicaCount: 1
 
   # -- enables the prometheus rules if set to true
   monitoring:
     enabled: true
 
+  # -- replicas of the gov-okta-addon
+  replicaCount: 1
+
+  # -- resource settings for the gov-okta-addon
   resources:
     limits:
       cpu: 100m
@@ -157,9 +164,11 @@ oktaAddon:
     secrets:
       # -- enable helm secrets, set to `true` if you want to set the value directly in the chart (not recommended)
       enabled: false
-      # -- client credentials secrets
+      # -- nats client credentials secrets
       natsCreds: 
+      # -- governor client secrets for the governor api
       governorClientSecret: 
+      # -- token to talk to the okta api
       oktaToken:
 
   # -- hydra settings for communication with the governor-api
