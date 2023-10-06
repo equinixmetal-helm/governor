@@ -1,0 +1,93 @@
+{{- if .Values.oktaAddon.enabled }}
+---
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: gov-okta-addon
+  labels: 
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- with .Values.oktaAddon.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.oktaAddon.replicaCount }}
+  revisionHistoryLimit: 3
+  selector: 
+  {{- with .Values.oktaAddon.matchLabels }}
+    {{- toYaml . | nindent 6 }}
+  {{- end }}
+  template:
+    metadata:
+      labels: 
+        helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        {{- with .Values.oktaAddon.labels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/okta-addon-configmap.yml") . | sha256sum }}
+    spec:
+      initContainers:
+      # Optional: Pre-creates the `/app-audit/audit.log` named pipe.
+      - image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
+        args:
+          - 'init'
+          - '-f'
+          - '/app-audit/audit.log'
+        name: init-audit-logs
+        resources:
+{{ toYaml .Values.audit.initContainer.resources | indent 10 }}
+        imagePullPolicy: {{ .Values.audit.auditImage.pullPolicy }}
+        volumeMounts:
+          - mountPath: /app-audit
+            name: audit-logs
+      containers:
+      - name: gov-okta-addon
+        args:
+          - serve
+          - --skip-delete={{ .Values.oktaAddon.skipDelete }}
+        envFrom:
+        - configMapRef:
+            name: gov-okta-addon-config
+        - secretRef:
+            name: gov-okta-addon-creds
+        image: "{{ .Values.oktaAddon.image.repository }}:{{ .Values.oktaAddon.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.oktaAddon.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.oktaAddon.port }}
+        livenessProbe:
+          httpGet:
+            path: /healthz/liveness
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /healthz/readiness
+            port: http
+        resources:
+{{ toYaml .Values.oktaAddon.resources | indent 10 }}
+        volumeMounts:
+        - name: natscreds
+          mountPath: "/nats"
+          readOnly: true
+        - name: audit-logs
+          mountPath: /app-audit
+      - name: audit-gov-okta-addon
+        args:
+          - -f
+          - /app-audit/audit.log
+        image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
+        resources:
+{{ toYaml .Values.audit.resources | indent 10 }}
+        volumeMounts:
+        - name: audit-logs
+          mountPath: /app-audit
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: audit-logs
+        emptyDir: {}
+      - name: natscreds
+        secret:
+          secretName: gov-okta-addon-nats-creds
+          defaultMode: 0400
+ {{- end }}

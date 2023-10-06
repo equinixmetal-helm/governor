@@ -1,0 +1,32 @@
+{{- if .Values.oktaAddon.enabled }}
+{{- if .Values.oktaAddon.monitoring.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gov-okta-addon-rules
+  labels:
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+  - name: gov-okta-addon.rules
+    rules:
+    - alert: Governor Okta addon group_membership_deleted_total count is warning
+      expr: sum(increase(gov_okta_addon_group_membership_deleted_total[5m])) by (pod, instance) > 5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: Governor Okta reconciler deleted a high number of group members
+        description: Governor Okta reconciler deleted more than 5 group members from a group in the last 5 minutes. {{`{{`}} $value {{`}}`}} group members removed in the last 5 minutes.
+    - alert: Governor Okta addon users_deleted_total count is warning
+      expr: sum(increase(gov_okta_addon_users_deleted_total[5m])) by (pod, instance) > 5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: Governor Okta reconciler deleted a high number of users
+        description: Governor Okta reconciler deleted more than 5 users in the last 5 minutes. {{`{{`}} $value {{`}}`}} users deleted in the last 5 minutes.
+ {{- end }}
+{{- end }}

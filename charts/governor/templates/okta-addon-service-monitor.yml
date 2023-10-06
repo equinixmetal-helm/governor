@@ -1,0 +1,22 @@
+{{- if .Values.oktaAddon.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gov-okta-addon
+  labels: 
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- with .Values.oktaAddon.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gov-okta-addon
+  endpoints:
+  - targetPort: {{ .Values.oktaAddon.port }}
+    path: /metrics
+    interval: 5s
+ {{- end }}
