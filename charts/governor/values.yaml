@@ -112,7 +112,7 @@ oktaAddon:
 
   image:
     repository: ghcr.io/metal-toolbox/gov-okta-addon
-    tag: 784-b89ffe9c
+    tag: 12-4375aa79
     pullPolicy: IfNotPresent
 
   # -- set of labels for the application 
@@ -125,7 +125,7 @@ oktaAddon:
   matchLabels:
     app.kubernetes.io/instance: gov-okta-addon
     app.kubernetes.io/name: gov-okta-addon
-    
+
   debug: false
   dryrun: false
   pretty: false
