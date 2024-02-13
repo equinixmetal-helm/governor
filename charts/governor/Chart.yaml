@@ -14,3 +14,4 @@ dependencies:
   - name: k8s-otel-collector
     repository: https://helm.equinixmetal.com
     version: 0.9.1
+    condition: otel-collector-enabled
