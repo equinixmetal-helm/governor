@@ -2,7 +2,7 @@ apiVersion: v2
 name: governor
 description: A helm chart for the Governor ecosystem
 type: application
-version: 0.2.0
+version: 0.2.7
 appVersion: v0.0.1
 
 dependencies:
@@ -14,3 +14,4 @@ dependencies:
   - name: k8s-otel-collector
     repository: https://helm.equinixmetal.com
     version: 0.9.1
+    condition: otel-collector-enabled

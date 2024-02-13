@@ -97,9 +97,15 @@ api:
       crdbCrt:
     uri:
       existingSecret: db-uri
+      existingKey: GOVERNOR_DB_URI
+    certs:
+      existingSecret: governor-api-crdb-ca
+
   # -- tracing settings
   tracing:
     enabled: true
+    endpoint: "http://opentelemetry-collector:4317"
+    insecure: "true"
     # -- tracing secrets, set to `true` if you want to set the value directly in the chart (not recommended)
     secrets:
       enabled: false
@@ -221,6 +227,9 @@ audit:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 1000
+
+# -- Enable/disable deployment of the otel collector
+otel-collector-enabled: true
 
 # -- settings for the otel collector sub-chart
 # ref https://github.com/equinixmetal-helm/k8s-otel-collector
