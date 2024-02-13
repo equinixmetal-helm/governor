@@ -46,11 +46,13 @@ spec:
         args:
           - serve
           - "--config=/config/.governor.yaml"
-        envFrom:
-        - secretRef:
-            name: {{ .Values.api.db.uri.existingSecret }}
-        {{- if .Values.api.tracing.enabled }}
         env:
+          - name: GOVERNOR_DB_URI
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.api.db.uri.existingSecret }}
+                key: {{ .Values.api.db.uri.existingKey }}
+        {{- if .Values.api.tracing.enabled }}
           - name: OTEL_EXPORTER_OTLP_ENDPOINT
             value: {{ .Values.api.tracing.endpoint }}
           - name: OTEL_EXPORTER_OTLP_INSECURE
@@ -128,7 +130,7 @@ spec:
           name: governor-api-config
       - name: dbcerts
         secret:
-          secretName: governor-api-crdb-ca
+          secretName: {{ .Values.api.db.certs.existingSecret }}
           defaultMode: 0444
       - name: audit-logs-api
         emptyDir: {}

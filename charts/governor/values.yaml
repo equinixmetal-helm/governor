@@ -97,6 +97,9 @@ api:
       crdbCrt:
     uri:
       existingSecret: db-uri
+      existingKey: GOVERNOR_DB_URI
+    certs:
+      existingSecret: governor-api-crdb-ca
 
   # -- tracing settings
   tracing:
