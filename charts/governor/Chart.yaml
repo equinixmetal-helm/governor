@@ -11,6 +11,3 @@ dependencies:
     tags:
       - bitnami-common
     version: 2.13.0
-  - name: k8s-otel-collector
-    repository: https://helm.equinixmetal.com
-    version: 0.10.0
