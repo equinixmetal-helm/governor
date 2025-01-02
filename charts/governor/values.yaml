@@ -221,8 +221,3 @@ audit:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 1000
-
-# -- settings for the otel collector sub-chart
-# ref https://github.com/equinixmetal-helm/k8s-otel-collector
-k8s-otel-collector:
-  include_otel_attributes: false
