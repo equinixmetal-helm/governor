@@ -23,7 +23,7 @@ api:
     # -- container image repository for the governor-api image
     repository: ghcr.io/metal-toolbox/governor-api
     # -- image tag version
-    tag: v0.2.5
+    tag: v0.3.0
     # -- image pull policy for the governor-api container
     pullPolicy: IfNotPresent
 
