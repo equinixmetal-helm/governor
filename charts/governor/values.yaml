@@ -70,7 +70,7 @@ api:
     useRuntimeAccessToken: false
 
   iamRuntime:
-    socket: unix:///tmp/runtime.sock
+    socket: unix:///var/iam-runtime/runtime.sock
     timeout: 15s
 
   # --  oidc settings, currently startup will fail without a valid oidc config

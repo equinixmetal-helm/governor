@@ -112,7 +112,7 @@ spec:
           readOnly: true
         - name: audit-logs-api
           mountPath: /app-audit
-        {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 12 }}
+        {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 8 }}
 
       # -- iam-runtime-infratographer container
       - {{- include "iam-runtime-infratographer.container" $ | nindent 8 }}
