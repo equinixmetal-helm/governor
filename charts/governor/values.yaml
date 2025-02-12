@@ -10,6 +10,10 @@ api:
     app.kubernetes.io/name: governor
     app.kubernetes.io/component: api
 
+  # -- set service account name for the governor-api
+  serviceAccount:
+    name: governor-api
+
   # -- set of additional match labels for the application 
   matchLabels:
     app.kubernetes.io/instance: governor
@@ -62,6 +66,12 @@ api:
       enabled: false
       # -- client credentials secrets
       clientCreds:
+    # -- use IAM runtime to authenticate to NATS
+    useRuntimeAccessToken: false
+
+  iamRuntime:
+    socket: unix:///tmp/runtime.sock
+    timeout: 15s
 
   # --  oidc settings, currently startup will fail without a valid oidc config
   oidc:
@@ -221,3 +231,30 @@ audit:
     readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 1000
+
+iam-runtime-infratographer:
+  config:
+    permissions:
+      disable: true
+    jwt:
+      jwksURI: "https://iam.metalctrl.io/jwks.json"
+      issuer: "https://iam.metalctrl.io"
+    accessTokenProvider:
+      enabled: true
+      source:
+        file:
+          tokenPath: "/var/run/secrets/tokens/iam-runtime"
+      exchange:
+        issuer: "https://iam.metalctrl.io"
+
+  volumeMounts:
+    - name: tokens
+      mountPath: "/var/run/secrets/tokens"
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

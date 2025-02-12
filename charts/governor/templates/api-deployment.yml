@@ -27,6 +27,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yml") . | sha256sum }}
     spec:
+      serviceAccountName: {{ .Values.api.serviceAccount.name }}
       initContainers:
       # Optional: Pre-creates the `/app-audit/audit.log` named pipe.
       - image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
@@ -42,6 +43,7 @@ spec:
           - mountPath: /app-audit
             name: audit-logs-api
       containers:
+      # -- governor-api
       - name: governor-api
         args:
           - serve
@@ -110,6 +112,12 @@ spec:
           readOnly: true
         - name: audit-logs-api
           mountPath: /app-audit
+        {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 12 }}
+
+      # -- iam-runtime-infratographer container
+      - {{- include "iam-runtime-infratographer.container" $ | nindent 8 }}
+
+      # -- audit-governor-api container
       - name: audit-governor-api
         args:
           - -f
@@ -122,6 +130,7 @@ spec:
           mountPath: /app-audit
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+
       volumes:
       - name: config-volume
         configMap:
@@ -136,4 +145,10 @@ spec:
         secret:
           secretName: governor-api-nats-creds
           defaultMode: 0444
+      {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
+      - name: tokens
+        projected:
+          sources:
+            - serviceAccountToken:
+                path: iam-runtime
 {{- end }}
