@@ -21,6 +21,11 @@ data:
       url: {{ .Values.api.nats.url }}
       creds-file: {{ .Values.api.nats.credsPath }}/governor-api-nats-client-creds
       subject-prefix: {{ .Values.api.nats.subjectPrefix }}
+      use-runtime-access-token: {{ .Values.api.nats.useRuntimeAccessToken }}
+
+    iam-runtime:
+      socket: {{ .Values.api.iamRuntime.socket }}
+      timeout: {{ .Values.api.iamRuntime.timeout }}
 
     oidc:
     {{- range .Values.api.oidc }}

@@ -1,0 +1,3 @@
+---
+# include other iam-runtime necessities
+{{- include "iam-runtime-infratographer.manifests" $ }}

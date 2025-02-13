@@ -34,7 +34,7 @@ helm install governor-api equinixmetal/governor-api
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| api | object | `{"adminGroups":"governor-admins","db":{"connections":{"max_idle":20,"max_lifetime":0,"max_open":20},"secrets":{"crdbCrt":null,"enabled":false,"uri":null},"uri":{"existingSecret":"db-uri"}},"debug":false,"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-api","tag":"v0.4.0"},"ingress":{"host":"api.governor.example.com","prefix":"api.governor"},"labels":{"app.kubernetes.io/component":"api","app.kubernetes.io/instance":"governor","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"governor"},"matchLabels":{"app.kubernetes.io/instance":"governor","app.kubernetes.io/name":"governor"},"nats":{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null},"oidc":[{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}],"readinessProbe":{"failureThreshold":3,"periodSeconds":20,"successThreshold":1,"timeoutSeconds":3},"replicaCount":2,"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}},"tracing":{"enabled":true,"secrets":{"enabled":false,"honeycombKey":null}}}` | governor-api settings |
+| api | object | `{"adminGroups":"governor-admins","db":{"connections":{"max_idle":20,"max_lifetime":0,"max_open":20},"secrets":{"crdbCrt":null,"enabled":false,"uri":null},"uri":{"existingSecret":"db-uri"}},"debug":false,"enabled":true,"iamRuntime":{"socket":"unix:///var/iam-runtime/runtime.sock","timeout":"15s"},"image":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-api","tag":"v0.4.0"},"ingress":{"host":"api.governor.example.com","prefix":"api.governor"},"labels":{"app.kubernetes.io/component":"api","app.kubernetes.io/instance":"governor","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"governor"},"matchLabels":{"app.kubernetes.io/instance":"governor","app.kubernetes.io/name":"governor"},"nats":{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null,"useRuntimeAccessToken":false},"oidc":[{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}],"readinessProbe":{"failureThreshold":3,"periodSeconds":20,"successThreshold":1,"timeoutSeconds":3},"replicaCount":2,"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}},"serviceAccount":{"name":"governor-api"},"tracing":{"enabled":true,"secrets":{"enabled":false,"honeycombKey":null}}}` | governor-api settings |
 | api.adminGroups | string | `"governor-admins"` | admin group for highest level permissions in the governor-api |
 | api.db | object | `{"connections":{"max_idle":20,"max_lifetime":0,"max_open":20},"secrets":{"crdbCrt":null,"enabled":false,"uri":null},"uri":{"existingSecret":"db-uri"}}` | settings for the backend db |
 | api.db.secrets | object | `{"crdbCrt":null,"enabled":false,"uri":null}` | db secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
@@ -49,13 +49,14 @@ helm install governor-api equinixmetal/governor-api
 | api.ingress.prefix | string | `"api.governor"` | prefix use for the governor api ingress |
 | api.labels | object | `{"app.kubernetes.io/component":"api","app.kubernetes.io/instance":"governor","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"governor"}` | set of additional labels for the application  |
 | api.matchLabels | object | `{"app.kubernetes.io/instance":"governor","app.kubernetes.io/name":"governor"}` | set of additional match labels for the application  |
-| api.nats | object | `{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null}` | nats settings for the governor-api |
+| api.nats | object | `{"credsPath":"/nats","secrets":{"clientCreds":null,"enabled":false},"subjectPrefix":"governor.events","url":null,"useRuntimeAccessToken":false}` | nats settings for the governor-api |
 | api.nats.credsPath | string | `"/nats"` | mount path for the nats creds file |
 | api.nats.secrets | object | `{"clientCreds":null,"enabled":false}` | nats secrets definitions |
 | api.nats.secrets.clientCreds | string | `nil` | client credentials secrets |
 | api.nats.secrets.enabled | bool | `false` | enable helm secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
 | api.nats.subjectPrefix | string | `"governor.events"` | subject prefix used for the nats events |
 | api.nats.url | string | `nil` | url to connection to nats |
+| api.nats.useRuntimeAccessToken | bool | `false` | use IAM runtime to authenticate to NATS |
 | api.oidc | list | `[{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}]` | oidc settings, currently startup will fail without a valid oidc config |
 | api.oidc[0] | object | `{"audience":"","enabled":true,"issuer":"","jwksuri":"","rolesClaim":"","userClaim":""}` | a unique identifier for your app that is issued to you when you register your app with the IdP |
 | api.readinessProbe | object | `{"failureThreshold":3,"periodSeconds":20,"successThreshold":1,"timeoutSeconds":3}` | readiness probe definitions for the governor-api pod |
@@ -65,9 +66,22 @@ helm install governor-api equinixmetal/governor-api
 | api.readinessProbe.timeoutSeconds | int | `3` | number of seconds to wait for the probe to timeout |
 | api.replicaCount | int | `2` | replicas of the governor-api |
 | api.resources | object | `{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}}` | resource settings for the governor-api |
+| api.serviceAccount | object | `{"name":"governor-api"}` | set service account name for the governor-api |
 | api.tracing | object | `{"enabled":true,"secrets":{"enabled":false,"honeycombKey":null}}` | tracing settings |
 | api.tracing.secrets | object | `{"enabled":false,"honeycombKey":null}` | tracing secrets, set to `true` if you want to set the value directly in the chart (not recommended) |
 | audit | object | `{"auditImage":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/audittail","tag":"v0.8.0"},"enabled":true,"initContainer":{"resources":{"limits":{"cpu":"100m","memory":"20Mi"},"requests":{"cpu":"100m","memory":"20Mi"}}},"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}}` | audit sidecar settings |
+| iam-runtime-infratographer.config.accessTokenProvider.enabled | bool | `true` |  |
+| iam-runtime-infratographer.config.accessTokenProvider.exchange.issuer | string | `"https://iam.metalctrl.io"` |  |
+| iam-runtime-infratographer.config.accessTokenProvider.source.file.tokenPath | string | `"/var/run/secrets/tokens/iam-runtime"` |  |
+| iam-runtime-infratographer.config.jwt.issuer | string | `"https://iam.metalctrl.io"` |  |
+| iam-runtime-infratographer.config.jwt.jwksURI | string | `"https://iam.metalctrl.io/jwks.json"` |  |
+| iam-runtime-infratographer.config.permissions.disable | bool | `true` |  |
+| iam-runtime-infratographer.resources.limits.cpu | int | `1` |  |
+| iam-runtime-infratographer.resources.limits.memory | string | `"256Mi"` |  |
+| iam-runtime-infratographer.resources.requests.cpu | string | `"100m"` |  |
+| iam-runtime-infratographer.resources.requests.memory | string | `"128Mi"` |  |
+| iam-runtime-infratographer.volumeMounts[0].mountPath | string | `"/var/run/secrets/tokens"` |  |
+| iam-runtime-infratographer.volumeMounts[0].name | string | `"tokens"` |  |
 | slackAddon | object | `{"api":{"audience":"https://api.governor.example.com","clientId":"gov-slack-addon-governor","url":"https://api.governor.example.com"},"autoscaling":{"enabled":false},"debug":false,"dryrun":false,"enabled":true,"hydra":{"url":"https://hydra.example.com/oauth2/token"},"image":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/metal-toolbox/governor-slack-addon","tag":"46-c41b0158"},"labels":{"app.kubernetes.io/instance":"gov-slack-addon","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"gov-slack-addon"},"matchLabels":{"app.kubernetes.io/instance":"gov-slack-addon","app.kubernetes.io/name":"gov-slack-addon"},"nats":{"credsPath":"/nats","subjectPrefix":"governor.events","url":"tls://nats.governor.example.com:4222,"},"nodeSelector":null,"ports":[{"containerPort":8000,"name":"http"}],"pretty":false,"reconciler":{"interval":"1h","locking":true},"replicas":1,"resources":{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"250m","memory":"500Mi"}},"securityContext":{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000},"service":{"port":80},"tolerations":null}` | slack-addon settings |
 | slackAddon.api | object | `{"audience":"https://api.governor.example.com","clientId":"gov-slack-addon-governor","url":"https://api.governor.example.com"}` | governor-api settings to retrieve required information by the slack addon |
 | slackAddon.debug | bool | `false` | set to true to turn on debug logging |
