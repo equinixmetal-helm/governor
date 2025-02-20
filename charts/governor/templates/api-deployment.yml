@@ -64,8 +64,6 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        securityContext:
-          runAsNonRoot: true
         ports:
         - name: http
           containerPort: 3001
@@ -131,6 +129,10 @@ spec:
           - -f
           - /app-audit/audit.log
         image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
+        {{- with .Values.audit.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         resources:
 {{ toYaml .Values.audit.resources | indent 10 }}
         volumeMounts:
