@@ -28,6 +28,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/slack-addon-configmap.yaml") . | sha256sum }}
     spec:
+      serviceAccountName: {{ .Values.slackAddon.serviceAccount.name }}
     {{- with .Values.slackAddon.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -91,10 +92,18 @@ spec:
           - name: natscreds
             mountPath: "/nats"
             readOnly: true
-        {{- if .Values.audit.enabled }} # Begin audittail toggle
+        {{- if .Values.audit.enabled }}
           # This is mounted in the 1st container
           - name: audit-logs
             mountPath: /app-audit
+        {{- end }}
+
+        {{- if .Values.api.iamRuntime.enabled }}
+        # -- iam-runtime-infratographer container
+        - {{- include "iam-runtime-infratographer.container" $ | nindent 10 }}
+        {{- end }}
+
+        {{- if .Values.audit.enabled }} # Begin audittail toggle
         # This is the audit container
         - name: gov-slack-addon-audit
           {{- with .Values.audit.securityContext }}
@@ -124,6 +133,15 @@ spec:
       - name: audit-logs
         emptyDir: {}
       {{- end }}
+      {{- if .Values.api.iamRuntime.enabled }}
+      {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
+      - name: tokens
+        projected:
+          sources:
+            - serviceAccountToken:
+                path: iam-runtime
+      {{- end -}}
+
       {{- with .Values.slackAddon.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

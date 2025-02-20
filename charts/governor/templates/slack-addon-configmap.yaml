@@ -19,6 +19,7 @@ data:
   GSA_GOVERNOR_TOKEN_URL: "{{ .Values.slackAddon.hydra.url }}"
   GSA_NATS_URL: "{{ .Values.slackAddon.nats.url }}"
   GSA_NATS_CREDS_FILE: "{{ .Values.slackAddon.nats.credsPath }}/gov-slack-addon-nats-client-creds"
+  GSA_NATS_USE_RUNTIME_ACCESS_TOKEN: "{{ .Values.slackAddon.nats.useRuntimeAccessToken }}"
   GSA_NATS_SUBJECT_PREFIX: "{{ .Values.slackAddon.nats.subjectPrefix }}"
   GSA_RECONCILER_INTERVAL:  "{{ .Values.slackAddon.reconciler.interval }}"
   GSA_RECONCILER_LOCKING:  "{{ .Values.slackAddon.reconciler.locking }}"

@@ -12,12 +12,21 @@ api:
 
   # -- set service account name for the governor-api
   serviceAccount:
-    name: governor-api
+    name: default
 
   # -- set of additional match labels for the application 
   matchLabels:
     app.kubernetes.io/instance: governor
     app.kubernetes.io/name: governor
+
+  # -- Security context to be added to the deployment
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
 
   # -- set to true to turn on debug logging
   debug: false
@@ -70,6 +79,7 @@ api:
     useRuntimeAccessToken: false
 
   iamRuntime:
+    enabled: false
     socket: unix:///var/iam-runtime/runtime.sock
     timeout: 15s
 
@@ -131,6 +141,10 @@ slackAddon:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: gov-slack-addon
 
+  # -- set service account name for the slack addon
+  serviceAccount:
+    name: default
+
   # -- set of match labels for the application 
   matchLabels:
     app.kubernetes.io/instance: gov-slack-addon
@@ -159,6 +173,13 @@ slackAddon:
     url: tls://nats.governor.example.com:4222,
     credsPath: /nats
     subjectPrefix: governor.events
+    useRuntimeAccessToken: false
+
+  # -- IAM runtime settings for the slack addon
+  iamRuntime:
+    enabled: false
+    socket: unix:///var/iam-runtime/runtime.sock
+    timeout: 15s
 
   # reconciler will run at the defined interval to ensure no events were missed
   reconciler:
@@ -204,7 +225,6 @@ slackAddon:
 
 # -- audit sidecar settings
 audit:
-  enabled: true
   auditImage:
     repository: ghcr.io/metal-toolbox/audittail
     tag: v0.8.0
@@ -232,6 +252,7 @@ audit:
     runAsNonRoot: true
     runAsUser: 1000
 
+# -- iam-runtime sidecar settings
 iam-runtime-infratographer:
   config:
     permissions:
@@ -258,3 +279,12 @@ iam-runtime-infratographer:
     requests:
       cpu: 100m
       memory: 128Mi
+
+  # -- Security context to be added to the deployment
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000

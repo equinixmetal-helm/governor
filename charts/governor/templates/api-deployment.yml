@@ -60,6 +60,10 @@ spec:
         {{- end }}
         image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        {{- with .Values.api.podSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         securityContext:
           runAsNonRoot: true
         ports:
@@ -112,10 +116,14 @@ spec:
           readOnly: true
         - name: audit-logs-api
           mountPath: /app-audit
+        {{- if .Values.api.iamRuntime.enabled }}
         {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 8 }}
+        {{- end }}
 
+      {{- if .Values.api.iamRuntime.enabled }}
       # -- iam-runtime-infratographer container
       - {{- include "iam-runtime-infratographer.container" $ | nindent 8 }}
+      {{- end }}
 
       # -- audit-governor-api container
       - name: audit-governor-api
@@ -145,10 +153,12 @@ spec:
         secret:
           secretName: governor-api-nats-creds
           defaultMode: 0444
+      {{- if .Values.api.iamRuntime.enabled }}
       {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
       - name: tokens
         projected:
           sources:
             - serviceAccountToken:
                 path: iam-runtime
+      {{- end }}
 {{- end }}
