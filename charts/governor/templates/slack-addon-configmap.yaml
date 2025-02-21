@@ -23,4 +23,6 @@ data:
   GSA_NATS_SUBJECT_PREFIX: "{{ .Values.slackAddon.nats.subjectPrefix }}"
   GSA_RECONCILER_INTERVAL:  "{{ .Values.slackAddon.reconciler.interval }}"
   GSA_RECONCILER_LOCKING:  "{{ .Values.slackAddon.reconciler.locking }}"
+  GSA_IAM_RUNTIME_SOCKET: "{{ .Values.slackAddon.iamRuntime.socket }}"
+  GSA_IAM_RUNTIME_TIMEOUT: "{{ .Values.slackAddon.iamRuntime.timeout }}"
 {{- end }}

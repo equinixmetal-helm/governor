@@ -97,8 +97,11 @@ spec:
           - name: audit-logs
             mountPath: /app-audit
         {{- end }}
+        {{- if .Values.slackAddon.iamRuntime.enabled }}
+        {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 10 }}
+        {{- end }}
 
-        {{- if .Values.api.iamRuntime.enabled }}
+        {{- if .Values.slackAddon.iamRuntime.enabled }}
         # -- iam-runtime-infratographer container
         - {{- include "iam-runtime-infratographer.container" $ | nindent 10 }}
         {{- end }}
@@ -133,7 +136,7 @@ spec:
       - name: audit-logs
         emptyDir: {}
       {{- end }}
-      {{- if .Values.api.iamRuntime.enabled }}
+      {{- if .Values.slackAddon.iamRuntime.enabled }}
       {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
       - name: tokens
         projected:
