@@ -20,7 +20,7 @@ api:
     app.kubernetes.io/name: governor
 
   # -- Security context to be added to the deployment
-  podSecurityContext:
+  securityContext:
     capabilities:
       drop:
         - ALL

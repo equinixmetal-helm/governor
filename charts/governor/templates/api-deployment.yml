@@ -28,10 +28,6 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yml") . | sha256sum }}
     spec:
       serviceAccountName: {{ .Values.api.serviceAccount.name }}
-      {{- with .Values.audit.securityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       initContainers:
       # Optional: Pre-creates the `/app-audit/audit.log` named pipe.
       - image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
@@ -68,6 +64,10 @@ spec:
         {{- end }}
         image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        {{- with .Values.api.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - name: http
           containerPort: 3001
