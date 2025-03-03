@@ -27,6 +27,7 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yml") . | sha256sum }}
     spec:
+      serviceAccountName: {{ .Values.api.serviceAccount.name }}
       initContainers:
       # Optional: Pre-creates the `/app-audit/audit.log` named pipe.
       - image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
@@ -35,6 +36,10 @@ spec:
           - '-f'
           - '/app-audit/audit.log'
         name: init-audit-logs-api
+        {{- with .Values.audit.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         resources:
 {{ toYaml .Values.audit.initContainer.resources | indent 10 }}
         imagePullPolicy: {{ .Values.audit.auditImage.pullPolicy }}
@@ -42,6 +47,7 @@ spec:
           - mountPath: /app-audit
             name: audit-logs-api
       containers:
+      # -- governor-api
       - name: governor-api
         args:
           - serve
@@ -58,8 +64,10 @@ spec:
         {{- end }}
         image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+        {{- with .Values.api.securityContext }}
         securityContext:
-          runAsNonRoot: true
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - name: http
           containerPort: 3001
@@ -110,11 +118,25 @@ spec:
           readOnly: true
         - name: audit-logs-api
           mountPath: /app-audit
+        {{- if .Values.api.iamRuntime.enabled }}
+        {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 8 }}
+        {{- end }}
+
+      {{- if .Values.api.iamRuntime.enabled }}
+      # -- iam-runtime-infratographer container
+      - {{- include "iam-runtime-infratographer.container" $ | nindent 8 }}
+      {{- end }}
+
+      # -- audit-governor-api container
       - name: audit-governor-api
         args:
           - -f
           - /app-audit/audit.log
         image: "{{ .Values.audit.auditImage.repository }}:{{ .Values.audit.auditImage.tag | default .Chart.AppVersion }}"
+        {{- with .Values.audit.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         resources:
 {{ toYaml .Values.audit.resources | indent 10 }}
         volumeMounts:
@@ -122,6 +144,7 @@ spec:
           mountPath: /app-audit
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+
       volumes:
       - name: config-volume
         configMap:
@@ -136,4 +159,12 @@ spec:
         secret:
           secretName: governor-api-nats-creds
           defaultMode: 0444
+      {{- if .Values.api.iamRuntime.enabled }}
+      {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
+      - name: tokens
+        projected:
+          sources:
+            - serviceAccountToken:
+                path: iam-runtime
+      {{- end }}
 {{- end }}
