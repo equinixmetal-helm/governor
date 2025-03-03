@@ -258,15 +258,15 @@ iam-runtime-infratographer:
     permissions:
       disable: true
     jwt:
-      jwksURI: "https://iam.metalctrl.io/jwks.json"
-      issuer: "https://iam.metalctrl.io"
+      jwksURI: ""
+      issuer: ""
     accessTokenProvider:
-      enabled: true
+      enabled: false
       source:
         file:
           tokenPath: "/var/run/secrets/tokens/iam-runtime"
       exchange:
-        issuer: "https://iam.metalctrl.io"
+        issuer: ""
 
   volumeMounts:
     - name: tokens
