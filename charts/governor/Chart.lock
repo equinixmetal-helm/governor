@@ -1,9 +1,9 @@
 dependencies:
 - name: common
   repository: https://charts.bitnami.com/bitnami
-  version: 2.31.3
+  version: 2.31.4
 - name: iam-runtime-infratographer
   repository: https://infratographer.github.io/charts
   version: v1.1.2
-digest: sha256:8e3c10779dcf7353fd808d48b37fd40e6d37045e4fb96594c57a3acf5ea150d5
-generated: "2025-07-28T20:34:09.47977043Z"
+digest: sha256:257ec36b51981b1dce2d0dae87f466ed0ebaaa03dad36bc2fec1ce61cf2682d2
+generated: "2025-08-12T15:04:02.201830896Z"
