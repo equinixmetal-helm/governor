@@ -36,7 +36,7 @@ api:
     # -- container image repository for the governor-api image
     repository: ghcr.io/metal-toolbox/governor-api
     # -- image tag version
-    tag: v0.8.0
+    tag: v0.9.1
     # -- image pull policy for the governor-api container
     pullPolicy: IfNotPresent
 
@@ -75,15 +75,29 @@ api:
       enabled: false
       # -- client credentials secrets
       clientCreds:
-    # -- use IAM runtime to authenticate to NATS
-    useRuntimeAccessToken: false
+    # -- authMode is the method used to authenticate to NATS, available options are:
+    #    - creds-file-only: use the NATS credentials file for authentication
+    #    - workload-identity: use Kubernetes workload identity for authentication
+    #    - iam-runtime: use the IAM runtime for authentication
+    authMode: creds-file-only
+
+  # -- workload identity federation
+  workloadIdentity:
+    # -- path to kube service account token
+    kubeServiceAccount: "/var/run/secrets/tokens/service-account-token"
+    subjectTokenType: "urn:ietf:params:oauth:token-type:id_token"
+    tokenURL: ""
+    audience: ""
+    scopes: []
 
   iamRuntime:
+    # -- enabling IAM runtime will inject iam-runtime-infratographer configs
+    #    and sidecars to the deployment
     enabled: false
     socket: unix:///var/iam-runtime/runtime.sock
     timeout: 15s
 
-  # --  oidc settings, currently startup will fail without a valid oidc config
+  # -- oidc settings, currently startup will fail without a valid oidc config
   oidc:
     # -- a unique identifier for your app that is issued to you when you register your app with the IdP
     - audience: ""
@@ -173,13 +187,24 @@ slackAddon:
     url: tls://nats.governor.example.com:4222,
     credsPath: /nats
     subjectPrefix: governor.events
-    useRuntimeAccessToken: false
+    authMode: creds-file-only
 
   # -- IAM runtime settings for the slack addon
   iamRuntime:
+    # -- enabling IAM runtime will inject iam-runtime-infratographer configs
+    #    and sidecars to the deployment
     enabled: false
     socket: unix:///var/iam-runtime/runtime.sock
     timeout: 15s
+
+  # -- workload identity federation settings for the slack addon
+  workloadIdentityFederation:
+    enabled: false
+    kubeServiceAccount: "/var/run/secrets/tokens/service-account-token"
+    subjectTokenType: "urn:ietf:params:oauth:token-type:id_token"
+    tokenURL: ""
+    audience: ""
+    scopes: []
 
   # reconciler will run at the defined interval to ensure no events were missed
   reconciler:
@@ -198,7 +223,7 @@ slackAddon:
   # -- image settings for the slack addon
   image:
     repository: ghcr.io/metal-toolbox/governor-slack-addon
-    tag: "46-c41b0158"
+    tag: "463-92d597cb"
     pullPolicy: IfNotPresent
 
   # -- Security context to be added to the deployment
@@ -264,7 +289,7 @@ iam-runtime-infratographer:
       enabled: false
       source:
         file:
-          tokenPath: "/var/run/secrets/tokens/iam-runtime"
+          tokenPath: "/var/run/secrets/tokens/service-account-token"
       exchange:
         issuer: ""
 

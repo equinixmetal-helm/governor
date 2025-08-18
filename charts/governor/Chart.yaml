@@ -2,7 +2,7 @@ apiVersion: v2
 name: governor
 description: A helm chart for the Governor ecosystem
 type: application
-version: 0.2.0
+version: 0.9.1
 appVersion: v0.0.1
 
 dependencies:
@@ -12,5 +12,5 @@ dependencies:
       - bitnami-common
     version: 2.31.3
   - name: iam-runtime-infratographer
-    version: v1.1.2
+    version: v1.2.0
     repository: "https://infratographer.github.io/charts"

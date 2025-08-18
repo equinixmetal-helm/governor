@@ -25,7 +25,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yaml") . | sha256sum }}
     spec:
       serviceAccountName: {{ .Values.api.serviceAccount.name }}
       initContainers:
@@ -118,6 +118,8 @@ spec:
           readOnly: true
         - name: audit-logs-api
           mountPath: /app-audit
+        - name: tokens
+          mountPath: "/var/run/secrets/tokens"
         {{- if .Values.api.iamRuntime.enabled }}
         {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 8 }}
         {{- end }}
@@ -159,12 +161,12 @@ spec:
         secret:
           secretName: governor-api-nats-creds
           defaultMode: 0444
-      {{- if .Values.api.iamRuntime.enabled }}
-      {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
       - name: tokens
         projected:
           sources:
             - serviceAccountToken:
-                path: iam-runtime
+                path: service-account-token
+      {{- if .Values.api.iamRuntime.enabled }}
+      {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
       {{- end }}
 {{- end }}
