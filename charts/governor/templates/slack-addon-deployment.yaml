@@ -142,7 +142,7 @@ spec:
         projected:
           sources:
             - serviceAccountToken:
-                path: iam-runtime
+                path: service-account-token
       {{- end -}}
 
       {{- with .Values.slackAddon.nodeSelector }}

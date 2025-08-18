@@ -21,11 +21,22 @@ data:
       url: {{ .Values.api.nats.url }}
       creds-file: {{ .Values.api.nats.credsPath }}/governor-api-nats-client-creds
       subject-prefix: {{ .Values.api.nats.subjectPrefix }}
-      use-runtime-access-token: {{ .Values.api.nats.useRuntimeAccessToken }}
+      auth-mode: {{ .Values.api.nats.authMode }}
 
     iam-runtime:
       socket: {{ .Values.api.iamRuntime.socket }}
       timeout: {{ .Values.api.iamRuntime.timeout }}
+
+    workload-identity:
+      kube-service-account: {{ .Values.api.workloadIdentity.kubeServiceAccount }}
+      audience: {{ .Values.api.workloadIdentity.audience }}
+      subject-token-type: {{ .Values.api.workloadIdentity.subjectTokenType }}
+      token-url: {{ .Values.api.workloadIdentity.tokenURL }}
+      {{- if .Values.api.workloadIdentity.scopes }}
+      scopes: {{- .Values.api.workloadIdentity.scopes | toYaml | nindent 8 }}
+      {{- else }}
+      scopes: []
+      {{- end }}
 
     oidc:
     {{- range .Values.api.oidc }}
