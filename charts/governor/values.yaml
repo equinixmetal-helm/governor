@@ -3,7 +3,7 @@ api:
   # -- enable the governor-api components
   enabled: true
 
-  # -- set of additional labels for the application 
+  # -- set of additional labels for the application
   labels:
     app.kubernetes.io/instance: governor
     app.kubernetes.io/managed-by: Helm
@@ -14,7 +14,7 @@ api:
   serviceAccount:
     name: default
 
-  # -- set of additional match labels for the application 
+  # -- set of additional match labels for the application
   matchLabels:
     app.kubernetes.io/instance: governor
     app.kubernetes.io/name: governor
@@ -42,6 +42,8 @@ api:
 
   # -- ingress settings for the governor-api
   ingress:
+    # -- ingress class name to use for the governor-api ingress, this should match the class name of your ingress controller
+    className: nginx
     # -- host definition for the api ingress
     host: api.governor.example.com
     # -- prefix use for the governor api ingress
@@ -153,7 +155,7 @@ slackAddon:
     - name: http
       containerPort: 8000
 
-  # -- set of labels for the application 
+  # -- set of labels for the application
   labels:
     app.kubernetes.io/instance: gov-slack-addon
     app.kubernetes.io/managed-by: Helm
@@ -163,7 +165,7 @@ slackAddon:
   serviceAccount:
     name: default
 
-  # -- set of match labels for the application 
+  # -- set of match labels for the application
   matchLabels:
     app.kubernetes.io/instance: gov-slack-addon
     app.kubernetes.io/name: gov-slack-addon
