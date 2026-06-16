@@ -48,6 +48,9 @@ api:
     host: api.governor.example.com
     # -- prefix use for the governor api ingress
     prefix: api.governor
+    # -- additional hosts for the api ingress
+    additionalHosts: []
+
 
   # -- readiness probe definitions for the governor-api pod
   readinessProbe:
