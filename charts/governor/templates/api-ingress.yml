@@ -1,4 +1,14 @@
 {{- if .Values.api.enabled }}
+{{ $ingressHost := .Values.api.ingress.host }}
+{{ $additionalHosts := .Values.api.ingress.additionalHosts }}
+{{ $hosts := list }}
+{{ $hosts = (prepend $hosts $ingressHost) }}
+{{- if $additionalHosts }}
+  {{- range $additionalHosts }}
+    {{- $h := . }}
+    {{- $hosts = (prepend $hosts $h) }}
+  {{- end }}
+{{- end }}
 ---
 apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
@@ -14,7 +24,8 @@ metadata:
 spec:
   ingressClassName: {{ .Values.api.ingress.className }}
   rules:
-    - host: {{ .Values.api.ingress.host }}
+    {{- range $hosts }}
+    - host: {{ . }}
       http:
         paths:
           - path: "/"
@@ -31,8 +42,11 @@ spec:
                 name: governor-api
                 port:
                   name: http
+    {{- end }}
   tls:
     - hosts:
-        - {{ .Values.api.ingress.host }}
+        {{- range $hosts }}
+        - {{ . }}
+      {{- end }}
       secretName: governor-api-tls
 {{- end }}
