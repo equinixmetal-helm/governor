@@ -1,0 +1,21 @@
+{{- if and .Values.api.enabled .Values.cedar.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: governor-api-cedar
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    {{- with .Values.api.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  schema.json: |-
+    {{- include "governor.cedar.schema" . | nindent 4 }}
+  policies.json: |-
+    {{- include "governor.cedar.policies" . | nindent 4 }}
+  data.json: |-
+    {{- include "governor.cedar.data" . | nindent 4 }}
+{{- end }}

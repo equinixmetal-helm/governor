@@ -95,6 +95,17 @@ api:
     audience: ""
     scopes: []
 
+  # -- projected service account token settings for the `tokens` volume, shared
+  #    by the workload-identity and iam-runtime auth paths (both read the token
+  #    at `/var/run/secrets/tokens/service-account-token`). Set `audience` to
+  #    mint the SA token with a specific `aud` claim (distinct from
+  #    `workloadIdentity.audience`, which is the exchange parameter sent to
+  #    `tokenURL`). Both fields are optional; when unset the SA token is minted
+  #    with the API server's default audience.
+  serviceAccountToken:
+    audience: ""
+    expirationSeconds:
+
   iamRuntime:
     # -- enabling IAM runtime will inject iam-runtime-infratographer configs
     #    and sidecars to the deployment
@@ -111,6 +122,14 @@ api:
       enabled: true
       rolesClaim: ""
       userClaim: ""
+      # -- optional per-provider Cedar authorization. When `cedar.enabled` is
+      #    true this provider's tokens are authorized by the cedar-agent sidecar
+      #    instead of by scope; it requires the top-level `cedar.enabled: true`.
+      #    The sidecar URL is derived from `cedar.port` and is not configurable
+      #    here.
+      # cedar:
+      #   enabled: true
+      #   timeout: 250ms
 
   # -- replicas of the governor-api
   replicaCount: 2
@@ -256,6 +275,65 @@ slackAddon:
     requests:
       cpu: 250m
       memory: 500Mi
+
+# -- cedar-agent external authorization sidecar settings
+cedar:
+  # -- deploy the permitio/cedar-agent sidecar alongside governor-api and
+  #    generate its schema/policies/data from the roles and bindings below.
+  #    Enable per-provider authorization with `api.oidc[].cedar.enabled`.
+  enabled: false
+
+  # -- image settings for the cedar-agent sidecar
+  image:
+    # -- container image repository for cedar-agent
+    repository: permitio/cedar-agent
+    # -- image tag version (pin explicitly; do not use latest)
+    tag: "0.2.2"
+    # -- image pull policy for the cedar-agent container
+    pullPolicy: IfNotPresent
+
+  # -- port cedar-agent listens on. It binds to loopback only and is reachable
+  #    by governor-api inside the pod at http://127.0.0.1:<port>
+  port: 8180
+
+  # -- resource settings for the cedar-agent sidecar
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  # -- Security context to be added to the cedar-agent container
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  # -- cedar roles, each rendered as one cedar policy. `id` is the policy id and
+  #    the key referenced by bindings; `name` (defaults to `id`) is the Cedar
+  #    `Role` entity id used in policies and data. Each entry in `permissions`
+  #    must be `<verb>:governor:<resource>` where verb is one of
+  #    create/read/update/delete and resource is one of users/groups/
+  #    applications/organizations/extensions/extensionresources/notifications/
+  #    events. Invalid permissions fail the render.
+  roles: []
+  #  - id: gov-some-addon
+  #    name: gov-some-addon
+  #    permissions:
+  #      - read:governor:users
+  #      - update:governor:users
+
+  # -- bind JWT subjects (Workload principals) to a role by its `id`. A subject
+  #    is the token `sub` claim, e.g. the WIF principal string.
+  bindings: []
+  #  - role: gov-some-addon
+  #    subjects:
+  #      - some-workload-subject
 
 # -- audit sidecar settings
 audit:
