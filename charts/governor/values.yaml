@@ -36,7 +36,7 @@ api:
     # -- container image repository for the governor-api image
     repository: ghcr.io/metal-toolbox/governor-api
     # -- image tag version
-    tag: v0.13.4
+    tag: v0.14.0
     # -- image pull policy for the governor-api container
     pullPolicy: IfNotPresent
 
@@ -123,13 +123,15 @@ api:
       rolesClaim: ""
       userClaim: ""
       # -- optional per-provider Cedar authorization. When `cedar.enabled` is
-      #    true this provider's tokens are authorized by the cedar-agent sidecar
-      #    instead of by scope; it requires the top-level `cedar.enabled: true`.
-      #    The sidecar URL is derived from `cedar.port` and is not configurable
-      #    here.
+      #    true this provider's tokens are authorized by a cedar-agent instead
+      #    of by scope. `url` defaults to the in-pod sidecar
+      #    (http://127.0.0.1:<cedar.port>), which requires the top-level
+      #    `cedar.enabled: true`; set `url` to point at an external cedar-agent
+      #    instead, in which case the sidecar is not required.
       # cedar:
       #   enabled: true
       #   timeout: 250ms
+      #   url: ""
 
   # -- replicas of the governor-api
   replicaCount: 2
@@ -295,6 +297,11 @@ cedar:
   # -- port cedar-agent listens on. It binds to loopback only and is reachable
   #    by governor-api inside the pod at http://127.0.0.1:<port>
   port: 8180
+
+  # -- cedar-agent log level (error, warn, info, debug, trace). Defaults to
+  #    `warn` to suppress the per-request and route-dump logging that `info`
+  #    emits; raise to `info`/`debug` for troubleshooting.
+  logLevel: warn
 
   # -- resource settings for the cedar-agent sidecar
   resources:

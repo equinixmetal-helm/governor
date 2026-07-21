@@ -56,12 +56,12 @@ data:
           username: {{ .userClaim }}
           {{- end }}
         {{- if and .cedar .cedar.enabled }}
-        {{- if not $root.Values.cedar.enabled }}
-        {{- fail (printf "api.oidc[%s]: cedar.enabled requires top-level cedar.enabled=true (no cedar-agent sidecar would be deployed)" .issuer) }}
+        {{- if and (not .cedar.url) (not $root.Values.cedar.enabled) }}
+        {{- fail (printf "api.oidc[%s]: cedar.enabled with no cedar.url requires top-level cedar.enabled=true so the sidecar is deployed; otherwise set cedar.url to an external cedar-agent" .issuer) }}
         {{- end }}
         cedar:
           enabled: true
-          url: "http://127.0.0.1:{{ $root.Values.cedar.port }}"
+          url: {{ .cedar.url | default (printf "http://127.0.0.1:%v" $root.Values.cedar.port) | quote }}
           timeout: {{ .cedar.timeout | default "250ms" }}
         {{- end }}
     {{- end }}

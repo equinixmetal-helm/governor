@@ -138,6 +138,8 @@ spec:
             value: "127.0.0.1"
           - name: CEDAR_AGENT_PORT
             value: {{ .Values.cedar.port | quote }}
+          - name: CEDAR_AGENT_LOG_LEVEL
+            value: {{ .Values.cedar.logLevel | quote }}
           - name: CEDAR_AGENT_SCHEMA
             value: /cedar/schema.json
           - name: CEDAR_AGENT_POLICIES
