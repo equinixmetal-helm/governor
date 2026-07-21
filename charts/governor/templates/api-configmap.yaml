@@ -23,9 +23,11 @@ data:
       subject-prefix: {{ .Values.api.nats.subjectPrefix }}
       auth-mode: {{ .Values.api.nats.authMode }}
 
+    {{- if .Values.api.iamRuntime.enabled }}
     iam-runtime:
       socket: {{ .Values.api.iamRuntime.socket }}
       timeout: {{ .Values.api.iamRuntime.timeout }}
+    {{- end }}
 
     workload-identity:
       kube-service-account: {{ .Values.api.workloadIdentity.kubeServiceAccount }}
@@ -53,6 +55,15 @@ data:
           {{- if .userClaim }}
           username: {{ .userClaim }}
           {{- end }}
+        {{- if and .cedar .cedar.enabled }}
+        {{- if and (not .cedar.url) (not $root.Values.cedar.enabled) }}
+        {{- fail (printf "api.oidc[%s]: cedar.enabled with no cedar.url requires top-level cedar.enabled=true so the sidecar is deployed; otherwise set cedar.url to an external cedar-agent" .issuer) }}
+        {{- end }}
+        cedar:
+          enabled: true
+          url: {{ .cedar.url | default (printf "http://127.0.0.1:%v" $root.Values.cedar.port) | quote }}
+          timeout: {{ .cedar.timeout | default "250ms" }}
+        {{- end }}
     {{- end }}
 
     {{- if .Values.api.debug }}

@@ -26,6 +26,9 @@ spec:
         {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yaml") . | sha256sum }}
+        {{- if .Values.cedar.enabled }}
+        checksum/cedar-config: {{ include (print $.Template.BasePath "/cedar-configmap.yaml") . | sha256sum }}
+        {{- end }}
     spec:
       serviceAccountName: {{ .Values.api.serviceAccount.name }}
       initContainers:
@@ -124,6 +127,37 @@ spec:
         {{- include "iam-runtime-infratographer.volumeMounts" $ | nindent 8 }}
         {{- end }}
 
+      {{- if .Values.cedar.enabled }}
+      # -- cedar-agent authorization sidecar (bound to loopback, reached by
+      #    governor-api at http://127.0.0.1:{{ .Values.cedar.port }})
+      - name: cedar-agent
+        image: "{{ .Values.cedar.image.repository }}:{{ .Values.cedar.image.tag }}"
+        imagePullPolicy: {{ .Values.cedar.image.pullPolicy }}
+        env:
+          - name: CEDAR_AGENT_ADDR
+            value: "127.0.0.1"
+          - name: CEDAR_AGENT_PORT
+            value: {{ .Values.cedar.port | quote }}
+          - name: CEDAR_AGENT_LOG_LEVEL
+            value: {{ .Values.cedar.logLevel | quote }}
+          - name: CEDAR_AGENT_SCHEMA
+            value: /cedar/schema.json
+          - name: CEDAR_AGENT_POLICIES
+            value: /cedar/policies.json
+          - name: CEDAR_AGENT_DATA
+            value: /cedar/data.json
+        {{- with .Values.cedar.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.cedar.resources | indent 10 }}
+        volumeMounts:
+          - name: cedar-config
+            mountPath: /cedar
+            readOnly: true
+      {{- end }}
+
       {{- if .Values.api.iamRuntime.enabled }}
       # -- iam-runtime-infratographer container
       - {{- include "iam-runtime-infratographer.container" $ | nindent 8 }}
@@ -166,6 +200,19 @@ spec:
           sources:
             - serviceAccountToken:
                 path: service-account-token
+                {{- with .Values.api.serviceAccountToken }}
+                {{- with .audience }}
+                audience: {{ . | quote }}
+                {{- end }}
+                {{- with .expirationSeconds }}
+                expirationSeconds: {{ . }}
+                {{- end }}
+                {{- end }}
+      {{- if .Values.cedar.enabled }}
+      - name: cedar-config
+        configMap:
+          name: governor-api-cedar
+      {{- end }}
       {{- if .Values.api.iamRuntime.enabled }}
       {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
       {{- end }}

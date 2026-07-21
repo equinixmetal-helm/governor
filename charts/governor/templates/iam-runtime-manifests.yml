@@ -1,3 +1,5 @@
+{{- if or .Values.api.iamRuntime.enabled .Values.slackAddon.iamRuntime.enabled }}
 ---
 # include other iam-runtime necessities
 {{- include "iam-runtime-infratographer.manifests" $ }}
+{{- end }}
