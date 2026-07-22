@@ -4,25 +4,71 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gov-slack-addon-config
-  labels: 
+  labels:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     {{- with .Values.slackAddon.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  GSA_DRYRUN: "{{ .Values.slackAddon.dryrun }}"
-  GSA_LOGGING_DEBUG: "{{ .Values.slackAddon.debug }}"
-  GSA_LOGGING_PRETTY: "{{ .Values.slackAddon.pretty }}"
-  GSA_GOVERNOR_AUDIENCE: "{{ .Values.slackAddon.api.audience }}"
-  GSA_GOVERNOR_CLIENT_ID: "{{ .Values.slackAddon.api.clientId }}"
-  GSA_GOVERNOR_URL: "{{ .Values.slackAddon.api.url }}"
-  GSA_GOVERNOR_TOKEN_URL: "{{ .Values.slackAddon.hydra.url }}"
-  GSA_NATS_URL: "{{ .Values.slackAddon.nats.url }}"
-  GSA_NATS_CREDS_FILE: "{{ .Values.slackAddon.nats.credsPath }}/gov-slack-addon-nats-client-creds"
-  GSA_NATS_AUTH_MODE: "{{ .Values.slackAddon.nats.authMode }}"
-  GSA_NATS_SUBJECT_PREFIX: "{{ .Values.slackAddon.nats.subjectPrefix }}"
-  GSA_RECONCILER_INTERVAL:  "{{ .Values.slackAddon.reconciler.interval }}"
-  GSA_RECONCILER_LOCKING:  "{{ .Values.slackAddon.reconciler.locking }}"
-  GSA_IAM_RUNTIME_SOCKET: "{{ .Values.slackAddon.iamRuntime.socket }}"
-  GSA_IAM_RUNTIME_TIMEOUT: "{{ .Values.slackAddon.iamRuntime.timeout }}"
+  config.yaml: |
+    dryrun: {{ .Values.slackAddon.dryrun }}
+
+    logging:
+      debug: {{ .Values.slackAddon.debug }}
+      pretty: {{ .Values.slackAddon.pretty }}
+
+    {{- if .Values.slackAddon.tracing.enabled }}
+    tracing:
+      enabled: true
+    {{- end }}
+
+    governor:
+      url: {{ .Values.slackAddon.api.url }}
+      application-type: {{ .Values.slackAddon.applicationType }}
+      workload-identity: {{ .Values.slackAddon.workloadIdentity.enabled }}
+      {{- if not .Values.slackAddon.workloadIdentity.enabled }}
+      # client-credentials (hydra) auth; used when workload identity is disabled.
+      # the client secret is injected via the gov-slack-addon-creds secret.
+      client-id: {{ .Values.slackAddon.api.clientId }}
+      audience: {{ .Values.slackAddon.api.audience }}
+      token-url: {{ .Values.slackAddon.hydra.url }}
+      {{- end }}
+
+    {{- if .Values.slackAddon.workloadIdentity.enabled }}
+    workload-identity:
+      kube-service-account: {{ .Values.slackAddon.workloadIdentity.kubeServiceAccount }}
+      audience: {{ .Values.slackAddon.workloadIdentity.audience }}
+      subject-token-type: {{ .Values.slackAddon.workloadIdentity.subjectTokenType }}
+      token-url: {{ .Values.slackAddon.workloadIdentity.tokenURL }}
+      {{- if .Values.slackAddon.workloadIdentity.scopes }}
+      scopes: {{- .Values.slackAddon.workloadIdentity.scopes | toYaml | nindent 8 }}
+      {{- else }}
+      scopes: []
+      {{- end }}
+    {{- end }}
+
+    {{- if .Values.slackAddon.iamRuntime.enabled }}
+    iam-runtime:
+      socket: {{ .Values.slackAddon.iamRuntime.socket }}
+      timeout: {{ .Values.slackAddon.iamRuntime.timeout }}
+    {{- end }}
+
+    nats:
+      url: {{ .Values.slackAddon.nats.url }}
+      creds-file: {{ .Values.slackAddon.nats.credsPath }}/gov-slack-addon-nats-client-creds
+      subject-prefix: {{ .Values.slackAddon.nats.subjectPrefix }}
+      auth-mode: {{ .Values.slackAddon.nats.authMode }}
+      queue-group: {{ .Values.slackAddon.nats.queueGroup }}
+      queue-size: {{ .Values.slackAddon.nats.queueSize }}
+
+    reconciler:
+      interval: {{ .Values.slackAddon.reconciler.interval }}
+      locking: {{ .Values.slackAddon.reconciler.locking }}
+
+    slack:
+      # the slack api token is injected via the gov-slack-addon-creds secret.
+      usergroup-prefix: {{ .Values.slackAddon.slack.usergroupPrefix | quote }}
+
+    audit:
+      log-path: /app-audit/audit.log
 {{- end }}

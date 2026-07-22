@@ -201,6 +201,23 @@ slackAddon:
   # -- dryrun on the reconcile loop
   dryrun: false
 
+  # -- governor application type slug the addon listens to events for
+  applicationType: slack
+
+  # -- slack api settings
+  slack:
+    # -- prefix prepended to slack usergroup names created by the addon.
+    #    the slack api token is provided via the gov-slack-addon-creds secret.
+    usergroupPrefix: "[Governor] "
+
+  # -- tracing settings for the slack addon
+  tracing:
+    enabled: false
+    # -- OpenTelemetry endpoint configuration
+    endpoint: "http://opentelemetry-collector:4317"
+    # -- whether to use insecure connection to the OTEL endpoint
+    insecure: true
+
   # -- governor-api settings to retrieve required information by the slack addon
   api:
     url: https://api.governor.example.com
@@ -218,6 +235,12 @@ slackAddon:
     credsPath: /nats
     subjectPrefix: governor.events
     authMode: creds-file-only
+    # -- queue group for load balancing events across addon replicas/subscriptions.
+    #    MUST be non-empty: with an empty group and queueSize > 1 every event is
+    #    fanned out to each subscription and processed multiple times.
+    queueGroup: gov-slack-addon
+    # -- number of concurrent subscriptions (workers) sharing the queue group
+    queueSize: 3
 
   # -- IAM runtime settings for the slack addon
   iamRuntime:
@@ -227,14 +250,26 @@ slackAddon:
     socket: unix:///var/iam-runtime/runtime.sock
     timeout: 15s
 
-  # -- workload identity federation settings for the slack addon
-  workloadIdentityFederation:
+  # -- workload identity federation settings for the slack addon. When enabled,
+  #    the addon authenticates to governor by exchanging its projected kube
+  #    service account token (mounted from the `tokens` volume) at `tokenURL`,
+  #    instead of using the hydra client-credentials flow.
+  workloadIdentity:
     enabled: false
     kubeServiceAccount: "/var/run/secrets/tokens/service-account-token"
     subjectTokenType: "urn:ietf:params:oauth:token-type:id_token"
     tokenURL: ""
     audience: ""
     scopes: []
+
+  # -- projected service account token settings for the `tokens` volume used by
+  #    the workload-identity (and iam-runtime) auth paths. Set `audience` to mint
+  #    the SA token with a specific `aud` claim (this is the token audience, which
+  #    is distinct from `workloadIdentity.audience`, the exchange
+  #    parameter sent to `tokenURL`). Both fields are optional.
+  serviceAccountToken:
+    audience: ""
+    expirationSeconds:
 
   # reconciler will run at the defined interval to ensure no events were missed
   reconciler:
@@ -253,7 +288,7 @@ slackAddon:
   # -- image settings for the slack addon
   image:
     repository: ghcr.io/metal-toolbox/governor-slack-addon
-    tag: "463-92d597cb"
+    tag: "147-57afee02"
     pullPolicy: IfNotPresent
 
   # -- Security context to be added to the deployment
