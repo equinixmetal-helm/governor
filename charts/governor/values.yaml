@@ -288,7 +288,7 @@ slackAddon:
   # -- image settings for the slack addon
   image:
     repository: ghcr.io/metal-toolbox/governor-slack-addon
-    tag: "147-57afee02"
+    tag: "463-92d597cb"
     pullPolicy: IfNotPresent
 
   # -- Security context to be added to the deployment
