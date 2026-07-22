@@ -59,9 +59,11 @@ spec:
         - name: gov-slack-addon
           args:
             - serve
+            - "--config=/etc/gov-slack-addon/config.yaml"
+          # non-secret config comes from the mounted config.yaml; only
+          # credentials (slack token, governor client secret) are injected as
+          # env vars from the secret, picked up by viper's GSA_ env binding.
           envFrom:
-          - configMapRef:
-              name: gov-slack-addon-config
           - secretRef:
               name: gov-slack-addon-creds
           {{- with .Values.slackAddon.securityContext }}
@@ -89,9 +91,18 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
+          - name: config-volume
+            mountPath: /etc/gov-slack-addon
+            readOnly: true
           - name: natscreds
             mountPath: "/nats"
             readOnly: true
+        {{- if .Values.slackAddon.workloadIdentity.enabled }}
+          # projected kube service account token exchanged for a governor token
+          - name: tokens
+            mountPath: "/var/run/secrets/tokens"
+            readOnly: true
+        {{- end }}
         {{- if .Values.audit.enabled }}
           # This is mounted in the 1st container
           - name: audit-logs
@@ -128,6 +139,9 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       volumes:
+      - name: config-volume
+        configMap:
+          name: gov-slack-addon-config
       - name: natscreds
         secret:
           secretName: gov-slack-addon-nats-creds
@@ -138,12 +152,22 @@ spec:
       {{- end }}
       {{- if .Values.slackAddon.iamRuntime.enabled }}
       {{- include "iam-runtime-infratographer.volumes" $ | nindent 6 }}
+      {{- end }}
+      {{- if or .Values.slackAddon.workloadIdentity.enabled .Values.slackAddon.iamRuntime.enabled }}
       - name: tokens
         projected:
           sources:
             - serviceAccountToken:
                 path: service-account-token
-      {{- end -}}
+                {{- with .Values.slackAddon.serviceAccountToken }}
+                {{- with .audience }}
+                audience: {{ . | quote }}
+                {{- end }}
+                {{- with .expirationSeconds }}
+                expirationSeconds: {{ . }}
+                {{- end }}
+                {{- end }}
+      {{- end }}
 
       {{- with .Values.slackAddon.nodeSelector }}
       nodeSelector:
