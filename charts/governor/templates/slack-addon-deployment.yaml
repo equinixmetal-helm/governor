@@ -66,13 +66,6 @@ spec:
           envFrom:
           - secretRef:
               name: gov-slack-addon-creds
-          {{- if .Values.slackAddon.tracing.enabled }}
-          env:
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: {{ .Values.slackAddon.tracing.endpoint | quote }}
-            - name: OTEL_EXPORTER_OTLP_INSECURE
-              value: {{ .Values.slackAddon.tracing.insecure | quote }}
-          {{- end }}
           {{- with .Values.slackAddon.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}

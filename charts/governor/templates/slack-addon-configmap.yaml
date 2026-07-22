@@ -20,6 +20,8 @@ data:
     {{- if .Values.slackAddon.tracing.enabled }}
     tracing:
       enabled: true
+      endpoint: {{ .Values.slackAddon.tracing.endpoint }}
+      insecure: {{ .Values.slackAddon.tracing.insecure }}
     {{- end }}
 
     governor:
